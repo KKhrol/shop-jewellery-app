@@ -1,0 +1,23 @@
+syntax = 'proto3';
+
+package order;
+
+service OrdersService {
+    rpc FindOne (OrderById) returns (Order);
+}
+
+message OrderById {
+    string id = 1;
+}
+
+message Order {
+    string orderId = 1;
+    string userId = 2;
+    double summary = 3;
+    repeated ItemInOrder itemInOrder = 4;
+}
+
+message ItemInOrder {
+    string itemId = 1;
+    int32 quantity = 2;  
+}

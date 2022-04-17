@@ -1,0 +1,21 @@
+syntax = 'proto3';
+
+package cart;
+
+service CartsService {
+    rpc FindOne (CartByUserId) returns (Cart);
+}
+
+message CartByUserId {
+    string id = 1;
+}
+
+message Cart {
+    string userId = 1;
+    repeated ItemInCart itemInCart = 2;
+}
+
+message ItemInCart {
+    string itemId = 1;
+    int32 quantity = 2;  
+}
