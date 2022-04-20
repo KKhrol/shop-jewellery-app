@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package review;
+
+service ReviewsService {
+    rpc FindOne (ReviewByItemId) returns (Review);
+}
+
+message ReviewByItemId {
+    string id = 1;
+}
+
+message Review {
+    string itemId = 1;
+    string userId = 2;
+    double mark = 3;
+}

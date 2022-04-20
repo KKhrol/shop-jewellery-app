@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Item {
+  id          String    @id @default(uuid())
+  jewelleryId String
+  metalId     String
+  price       Int
+  description String
+  delivery    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @default(now())
+
+  jewellery Jewellery @relation(fields: [jewelleryId], references: [id])
+  metal     Metal     @relation(fields: [metalId], references: [id])
+
+  @@unique([jewelleryId, metalId])
+  @@map("items")
+  Image Image[]
+}
+
+model Image {
+  imageId  String @id @default(uuid())
+  imageURL String
+  itemId   String
+
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@map("images")
+}
+
+model Metal {
+  id    String @id @default(uuid())
+  name  String @unique
+  care  String
+  image String
+
+  @@map("metals")
+  Item Item[]
+}
+
+model Jewellery {
+  id           String @id @default(uuid())
+  name         String
+  description  String
+  collectionId String @default(uuid())
+
+  @@map("jewelleries")
+  Item Item[]
+}
