@@ -13,7 +13,7 @@ CREATE TABLE "orders" (
 CREATE TABLE "items" (
     "id" TEXT NOT NULL,
     "image" TEXT NOT NULL,
-    "itemName" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "metalImage" TEXT NOT NULL,
     "price" INTEGER NOT NULL,

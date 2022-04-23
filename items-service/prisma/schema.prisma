@@ -25,7 +25,7 @@ model Item {
 
   @@unique([jewelleryId, metalId])
   @@map("items")
-  Image Image[]
+  image Image[]
 }
 
 model Image {
@@ -50,9 +50,9 @@ model Metal {
 
 model Jewellery {
   id           String @id @default(uuid())
-  name         String
+  name         String @unique
   description  String
-  collectionId String @default(uuid())
+  collectionId String?
 
   @@map("jewelleries")
   Item Item[]

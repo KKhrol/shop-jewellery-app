@@ -36,7 +36,7 @@ CREATE TABLE "jewelleries" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "collectionId" TEXT NOT NULL,
+    "collectionId" TEXT,
 
     CONSTRAINT "jewelleries_pkey" PRIMARY KEY ("id")
 );
@@ -46,6 +46,9 @@ CREATE UNIQUE INDEX "items_jewelleryId_metalId_key" ON "items"("jewelleryId", "m
 
 -- CreateIndex
 CREATE UNIQUE INDEX "metals_name_key" ON "metals"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "jewelleries_name_key" ON "jewelleries"("name");
 
 -- AddForeignKey
 ALTER TABLE "items" ADD CONSTRAINT "items_metalId_fkey" FOREIGN KEY ("metalId") REFERENCES "metals"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
