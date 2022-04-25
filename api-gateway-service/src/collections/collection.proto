@@ -2,8 +2,12 @@ syntax = "proto3";
 
 package collection;
 
-service CollectionsService {
+service CollectionsController {
     rpc FindOne (CollectionById) returns (Collection);
+    rpc FindMany (CollectionsOnPage) returns (stream Collection);
+    rpc PostOne (CollectionDto) returns (CollectionFullInfo);
+    rpc UpdateOne (Collection) returns (CollectionFullInfo);
+    rpc DeleteOne (CollectionById) returns (DeleteResponse);
 }
 
 message CollectionById {
@@ -15,4 +19,28 @@ message Collection {
     string name = 2;
     string description = 3;
     string image = 4;
+}
+
+message CollectionFullInfo {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string image = 4;
+    string createdAt = 5;
+    string updatedAt = 6;
+}
+
+message CollectionDto {
+    string name = 1;
+    string description = 2;
+    string image = 3;
+}
+
+message CollectionsOnPage {
+    int32 page = 1;
+    int32 itemsPerPage = 2;
+}
+
+message DeleteResponse {
+    string message = 1;
 }

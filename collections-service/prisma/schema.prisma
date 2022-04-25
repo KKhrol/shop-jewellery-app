@@ -16,7 +16,7 @@ model Collection {
   description  String
   image        String
   createdAt  DateTime   @default(now())
-  updatededAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now())
 
   @@map("collections")
 }

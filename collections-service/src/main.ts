@@ -11,7 +11,7 @@ async function bootstrap() {
       options: {
         url: 'localhost:5501',
         package: 'collection',
-        protoPath: join(__dirname, './collections/collection.proto'),
+        protoPath: join(__dirname, '../collections/collection.proto'),
       },
     },
   );
