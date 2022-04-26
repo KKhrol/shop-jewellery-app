@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
-import { grpcClientItemOptions } from 'src/grpc-client-options/grpc-client-item.options';
+import { grpcClientReviewOptions } from '../grpc-client-options/grcp-client-review.options';
+import { grpcClientInventoryOptions } from '../grpc-client-options/grcp-client-inventory.options';
+import { grpcClientItemOptions } from '../grpc-client-options/grpc-client-item.options';
 import { ItemsController } from './items.controller';
 
 @Module({
@@ -9,6 +11,14 @@ import { ItemsController } from './items.controller';
       {
         name: 'ITEM_PACKAGE',
         ...grpcClientItemOptions,
+      },
+      {
+        name: 'INVENTORY_PACKAGE',
+        ...grpcClientInventoryOptions,
+      },
+      {
+        name: 'REVIEW_PACKAGE',
+        ...grpcClientReviewOptions,
       },
     ]),
   ],

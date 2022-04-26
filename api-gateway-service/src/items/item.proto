@@ -13,17 +13,19 @@ message ItemById {
 
 message Item {
     string id = 1;
-    string name = 2;
-    string descriptionJewellery = 3;
-    repeated string image = 4;
-    string material = 5;
-    string care = 6;
-    double price = 7;
-    string descriptionItem = 8;
-    string delivery = 9;
-    double rating = 10;
-    int32 voters = 11;
-    int32 quantity = 12;
+    string jewelleryId = 2;
+    string name = 3;
+    string descriptionJewellery = 4;
+    string collectionId = 5;
+    string metalName = 6;
+    string metalImage = 7;
+    string care = 8;
+    double price = 9;
+    string descriptionItem = 10;
+    string delivery = 11;
+    repeated string images = 12;
+    repeated string availableMetals = 13;
+    repeated string availableMetalsImages = 14;
 }
 
 message ItemsPerPage {

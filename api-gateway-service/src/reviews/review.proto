@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package review;
 
-service ReviewsService {
+service ReviewsController {
     rpc FindOne (ReviewByItemId) returns (Review);
 }
 
@@ -11,7 +11,6 @@ message ReviewByItemId {
 }
 
 message Review {
-    string itemId = 1;
-    string userId = 2;
-    double mark = 3;
+    int32 voters = 1;
+    double mark = 2;
 }

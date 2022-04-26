@@ -1,5 +1,4 @@
 export interface Review {
-  itemId: string;
-  userId: string;
+  voters: number;
   mark: number;
 }

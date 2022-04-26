@@ -12,8 +12,9 @@ export class InventoryController implements OnModuleInit {
 
   private inventoryService: IInventoryService;
   onModuleInit() {
-    this.inventoryService =
-      this.client.getService<IInventoryService>('InventoryService');
+    this.inventoryService = this.client.getService<IInventoryService>(
+      'InventoryController',
+    );
   }
 
   @Get(':id')

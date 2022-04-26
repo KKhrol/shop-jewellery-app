@@ -13,14 +13,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, of, timeout, toArray } from 'rxjs';
+import { forkJoin, Observable, toArray } from 'rxjs';
 import { CreateCollectionDto } from './interfaces/create-collection.interface';
 import { ICollectionsService } from './interfaces/collection-service.interface';
 import { Collection } from './interfaces/collection.interface';
 import { UpdateCollectionDto } from './interfaces/update-collection.interface';
 import { DeleteCollectionDto } from './interfaces/delete-collection.interface';
 import { IItemsService } from '../items/interfaces/item-service.interface';
-import { CollectionWithItems } from '../common-interfaces/collection-with-items.interface';
 import { ItemInCollection } from 'src/items/interfaces/item-in-collection.interface';
 
 @Controller('collections')
@@ -45,9 +44,7 @@ export class CollectionsController implements OnModuleInit {
   getCollection(
     @Param('id') collectionId: string,
     @Query('page') numberOfPage: number,
-  ): Observable<
-    ItemInCollection[]
-  > /*Observable<CollectionWithItems>*/ /*Observable<Collection>*/ {
+  ): Observable<[Collection, ItemInCollection[]]> {
     const itemsPerPage = 3;
     const page = Number(numberOfPage);
 
@@ -56,12 +53,10 @@ export class CollectionsController implements OnModuleInit {
       itemsPerPage,
       collectionId,
     });
-    //.pipe(timeout(10000));
     const items = stream.pipe(toArray());
     const collection = this.collectionsService.findOne({ id: collectionId });
-    //.pipe(timeout(10000));
-    //return of({ collection, items });
-    return items;
+
+    return forkJoin([collection, items]);
   }
 
   @Get()

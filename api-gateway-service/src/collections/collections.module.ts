@@ -16,12 +16,6 @@ import { CollectionsController } from './collections.controller';
         ...grpcClientItemOptions,
       },
     ]),
-    /*ClientsModule.register([
-      {
-        name: 'ITEM_PACKAGE',
-        ...grpcClientItemOptions,
-      },
-    ]),*/
   ],
   controllers: [CollectionsController],
 })

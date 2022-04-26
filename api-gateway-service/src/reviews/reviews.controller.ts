@@ -11,7 +11,7 @@ export class ReviewsController implements OnModuleInit {
   private reviewsService: IReviewsService;
   onModuleInit() {
     this.reviewsService =
-      this.client.getService<IReviewsService>('ReviewsService');
+      this.client.getService<IReviewsService>('ReviewsController');
   }
 
   @Get(':id')

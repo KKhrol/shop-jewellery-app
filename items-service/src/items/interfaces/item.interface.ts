@@ -1,14 +1,16 @@
 export interface Item {
   id: string;
+  jewelleryId: string;
   name: string;
   descriptionJewellery: string;
-  image: string[];
-  material: string;
+  collectionId: string;
+  metalName: string;
+  metalImage: string;
   care: string;
   price: number;
   descriptionItem: string;
   delivery: string;
-  rating: number;
-  voters: number;
-  quantity: number;
+  images: string[];
+  availableMetals: string[];
+  availableMetalsImages: string[];
 }
