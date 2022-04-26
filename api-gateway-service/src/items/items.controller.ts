@@ -10,7 +10,8 @@ export class ItemsController implements OnModuleInit {
 
   private itemsService: IItemsService;
   onModuleInit() {
-    this.itemsService = this.client.getService<IItemsService>('ItemsService');
+    this.itemsService =
+      this.client.getService<IItemsService>('ItemsController');
   }
 
   @Get(':id')

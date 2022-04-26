@@ -2,8 +2,9 @@ syntax = "proto3";
 
 package item;
 
-service ItemsService {
+service ItemsController {
     rpc FindOne (ItemById) returns (Item);
+    rpc FindMany (ItemsPerPage) returns (stream ItemOnPage);
 }
 
 message ItemById {
@@ -23,4 +24,17 @@ message Item {
     double rating = 10;
     int32 voters = 11;
     int32 quantity = 12;
+}
+
+message ItemsPerPage {
+    int32 page = 1;
+    int32 itemsPerPage = 2;
+    string collectionId = 3;
+}
+
+message ItemOnPage {
+    string id = 1;
+    string name = 2;
+    string image = 3;
+    int32 price = 4;
 }

@@ -16,6 +16,7 @@ export class CollectionsService {
         id,
       },
     });
+    console.log(collection);
     return collection;
   }
 

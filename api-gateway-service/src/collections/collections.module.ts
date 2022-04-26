@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
-import { grpcClientCollectionOptions } from 'src/grpc-client-options/grpc-client-collection.options';
+import { grpcClientItemOptions } from '../grpc-client-options/grpc-client-item.options';
+import { grpcClientCollectionOptions } from '../grpc-client-options/grpc-client-collection.options';
 import { CollectionsController } from './collections.controller';
 
 @Module({
@@ -10,7 +11,17 @@ import { CollectionsController } from './collections.controller';
         name: 'COLLECTION_PACKAGE',
         ...grpcClientCollectionOptions,
       },
+      {
+        name: 'ITEM_PACKAGE',
+        ...grpcClientItemOptions,
+      },
     ]),
+    /*ClientsModule.register([
+      {
+        name: 'ITEM_PACKAGE',
+        ...grpcClientItemOptions,
+      },
+    ]),*/
   ],
   controllers: [CollectionsController],
 })

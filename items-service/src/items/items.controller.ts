@@ -1,11 +1,17 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 import { ItemById } from './interfaces/item-by-id.interface';
+import { ItemInCollection } from './interfaces/item-in-collection.interface';
 import { Item } from './interfaces/item.interface';
+import { ItemsOnPage } from './interfaces/items-page.interface';
+import { ItemsService } from './items.service';
 
-@Controller('items')
+@Controller()
 export class ItemsController {
-  @GrpcMethod('ItemsService', 'FindOne')
+  constructor(private readonly itemsService: ItemsService) {}
+
+  /*@GrpcMethod('ItemsController', 'FindOne')
   findOne(data: ItemById): Item {
     console.log('Here');
     const items = [
@@ -39,5 +45,14 @@ export class ItemsController {
       },
     ];
     return items.find(({ id }) => id === data.id);
+  }*/
+
+  @GrpcMethod('ItemsController', 'FindMany')
+  async findMany(data: ItemsOnPage): Promise<Observable<ItemInCollection>> {
+    return this.itemsService.getItems(
+      data.page,
+      data.itemsPerPage,
+      data.collectionId,
+    );
   }
 }
