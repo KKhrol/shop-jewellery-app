@@ -5,6 +5,9 @@ package item;
 service ItemsController {
     rpc FindOne (ItemById) returns (Item);
     rpc FindMany (ItemsPerPage) returns (stream ItemOnPage);
+    rpc PostOne (CreateItemDto) returns (UpsertedItem);
+    rpc DeleteOne (ItemById) returns (DeleteResponse);
+    rpc UpdateOne (UpdateItemDto) returns (UpsertedItem);
 }
 
 message ItemById {
@@ -39,4 +42,50 @@ message ItemOnPage {
     string name = 2;
     string image = 3;
     int32 price = 4;
+}
+
+message CreateItemDto {
+    string name = 1;
+    string descriptionJewellery = 2;
+    string collectionId = 3;
+    string metalName = 4;
+    string metalImage = 5;
+    string care = 6; 
+    int32 price = 7;
+    string descriptionItem = 8;
+    string delivery = 9;
+    repeated string images = 10;
+}
+
+message UpsertedItem {
+    string id = 1;
+    string jewelleryId = 2;
+    string name = 3;
+    string descriptionJewellery = 4;
+    string collectionId = 5;
+    string metalName = 6;
+    string metalImage = 7;
+    string care = 8;
+    double price = 9;
+    string descriptionItem = 10;
+    string delivery = 11;
+    repeated string images = 12;
+}
+
+message UpdateItemDto {
+    string id = 1;
+    string name = 2;        
+    string descriptionJewellery = 3;
+    string collectionId = 4; 
+    string metalName = 5;        
+    string metalImage = 6; 
+    string care = 7; 
+    int32 price = 8;
+    string descriptionItem = 9;
+    string delivery = 10; 
+    repeated string images = 11;
+}
+
+message DeleteResponse {
+    string message = 1;
 }

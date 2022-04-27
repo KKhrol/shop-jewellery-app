@@ -4,6 +4,7 @@ package review;
 
 service ReviewsController {
     rpc FindOne (ReviewByItemId) returns (Review);
+    rpc DeleteOne (ReviewByItemId) returns (DeleteResponse);
 }
 
 message ReviewByItemId {
@@ -13,4 +14,8 @@ message ReviewByItemId {
 message Review {
     int32 voters = 1;
     double mark = 2;
+}
+
+message DeleteResponse {
+    string message = 1;
 }

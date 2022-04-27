@@ -23,8 +23,10 @@ export class CollectionsController {
     return this.collectionsService.getCollections(data.page, data.itemsPerPage);
   }
 
-  @GrpcMethod('CollectionsController', 'PostOne')
-  async postOne(createCollectionDto: CreateCollectionDto): Promise<Collection> {
+  @GrpcMethod('CollectionsController', 'PostCollection')
+  async postCollection(
+    createCollectionDto: CreateCollectionDto,
+  ): Promise<Collection> {
     return this.collectionsService.addCollection(createCollectionDto);
   }
 

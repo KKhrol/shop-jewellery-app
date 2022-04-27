@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { from, Observable } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateItemDto } from './interfaces/create-item.interface';
+import { ItemOutputDto } from './interfaces/item-output.interface';
+import { DeleteItemDto } from './interfaces/deleted-item-output.interface';
 import { ItemInCollection } from './interfaces/item-in-collection.interface';
 import { Item } from './interfaces/item.interface';
+import { UpdateItemDto } from './interfaces/update-item.interface';
 
 @Injectable()
 export class ItemsService {
@@ -141,5 +145,193 @@ export class ItemsService {
 
     const result = from(res);
     return result;
+  }
+
+  async addItem(data: CreateItemDto): Promise<ItemOutputDto> {
+    const item = await this.prisma.item.create({
+      data: {
+        price: data.price,
+        description: data.descriptionItem,
+        delivery: data.delivery,
+        jewellery: {
+          connectOrCreate: {
+            where: {
+              name: data.name,
+            },
+            create: {
+              name: data.name,
+              description: data.descriptionJewellery,
+              collectionId: data.collectionId,
+            },
+          },
+        },
+        metal: {
+          connectOrCreate: {
+            where: {
+              name: data.metalName,
+            },
+            create: {
+              name: data.metalName,
+              care: data.care,
+              image: data.metalImage,
+            },
+          },
+        },
+        image: {
+          create: Array.from(data.images).map((image) => ({
+            imageURL: image,
+          })),
+        },
+      },
+      include: {
+        jewellery: true,
+        metal: true,
+        image: true,
+      },
+    });
+
+    const images = Array<string>();
+
+    let i = 0;
+    item.image.forEach(function (item) {
+      images[i] = item.imageURL;
+      i++;
+    });
+
+    const res = {
+      id: item.id,
+      jewelleryId: item.jewelleryId,
+      name: item.jewellery.name,
+      descriptionJewellery: item.jewellery.description,
+      collectionId: item.jewellery.collectionId,
+      metalName: item.metal.name,
+      metalImage: item.metal.image,
+      care: item.metal.care,
+      price: item.price,
+      descriptionItem: item.description,
+      delivery: item.delivery,
+      images: images,
+    };
+    return res;
+  }
+
+  async deleteItem(id: string): Promise<DeleteItemDto> {
+    const jewelleryId = (
+      await this.prisma.item.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          jewelleryId: true,
+        },
+      })
+    ).jewelleryId;
+
+    //this shows how many jewelleries we have (jewellery is the same, but it can be in different colors)
+    const jewelleryCount = (
+      await this.prisma.item.aggregate({
+        where: {
+          jewelleryId: {
+            equals: jewelleryId,
+          },
+        },
+        _count: {
+          metalId: true,
+        },
+      })
+    )._count.metalId;
+
+    await this.prisma.image.deleteMany({
+      where: {
+        itemId: id,
+      },
+    });
+
+    const deletedItem = await this.prisma.item.delete({
+      where: {
+        id,
+      },
+    });
+    console.log(deletedItem);
+
+    //if we had jewellery (item) in the only 1 color (which we deleted above), then we need to delete the jewellery itself
+    if (jewelleryCount === 1) {
+      const jewelleryDeleted = await this.prisma.jewellery.delete({
+        where: {
+          id: jewelleryId,
+        },
+      });
+      console.log(jewelleryDeleted);
+    }
+
+    const result = { message: 'Item was deleted!' };
+    return result;
+  }
+
+  //not fully implemented. need to think over.
+  async updateItem(data: UpdateItemDto): Promise<ItemOutputDto> {
+    const item = await this.prisma.item.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        price: data.price,
+        description: data.descriptionItem,
+        delivery: data.delivery,
+        jewellery: {
+          update: {
+            name: data.name,
+            description: data.descriptionJewellery,
+            collectionId: data.collectionId,
+          },
+        },
+        metal: {
+          connectOrCreate: {
+            where: {
+              name: data.metalName,
+            },
+            create: {
+              name: data.metalName,
+              care: data.care,
+              image: data.metalImage,
+            },
+          },
+        },
+        image: {
+          create: Array.from(data.images).map((image) => ({
+            imageURL: image,
+          })),
+        },
+      },
+      include: {
+        jewellery: true,
+        image: true,
+        metal: true,
+      },
+    });
+
+    const images = Array<string>();
+
+    let i = 0;
+    item.image.forEach(function (item) {
+      images[i] = item.imageURL;
+      i++;
+    });
+
+    const res = {
+      id: item.id,
+      jewelleryId: item.jewelleryId,
+      name: item.jewellery.name,
+      descriptionJewellery: item.jewellery.description,
+      collectionId: item.jewellery.collectionId,
+      metalName: item.metal.name,
+      metalImage: item.metal.image,
+      care: item.metal.care,
+      price: item.price,
+      descriptionItem: item.description,
+      delivery: item.delivery,
+      images: images,
+    };
+    return res;
   }
 }

@@ -20,7 +20,10 @@ import { Collection } from './interfaces/collection.interface';
 import { UpdateCollectionDto } from './interfaces/update-collection.interface';
 import { DeleteCollectionDto } from './interfaces/delete-collection.interface';
 import { IItemsService } from '../items/interfaces/item-service.interface';
-import { ItemInCollection } from 'src/items/interfaces/item-in-collection.interface';
+import { ItemInCollection } from '../items/interfaces/item-in-collection.interface';
+import { CreateItemInCollection } from '../common-interfaces/create-item-in-collection.interface';
+import { CreateItemDto } from '../items/interfaces/create-item.interface';
+import { ItemOutputDto } from '../items/interfaces/item-output.interface';
 
 @Controller('collections')
 export class CollectionsController implements OnModuleInit {
@@ -72,10 +75,22 @@ export class CollectionsController implements OnModuleInit {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  postOne(
+  postCollection(
     @Body() createCollectionDto: CreateCollectionDto,
   ): Observable<Collection> {
-    return this.collectionsService.postOne(createCollectionDto);
+    return this.collectionsService.postCollection(createCollectionDto);
+  }
+
+  @Post(':id')
+  @HttpCode(HttpStatus.CREATED)
+  postItemInCollection(
+    @Param('id') collectionId: string,
+    @Body() createItemInCollection: CreateItemInCollection,
+  ): Observable<ItemOutputDto> {
+    const createItem: CreateItemDto = createItemInCollection;
+    createItem.collectionId = collectionId;
+
+    return this.itemsService.postOne(createItem);
   }
 
   @Put(':id')

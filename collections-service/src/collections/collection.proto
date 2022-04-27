@@ -5,7 +5,7 @@ package collection;
 service CollectionsController {
     rpc FindOne (CollectionById) returns (Collection);
     rpc FindMany (CollectionsOnPage) returns (stream Collection);
-    rpc PostOne (CollectionDto) returns (CollectionFullInfo);
+    rpc PostCollection (CollectionDto) returns (CollectionFullInfo);
     rpc UpdateOne (Collection) returns (CollectionFullInfo);
     rpc DeleteOne (CollectionById) returns (DeleteResponse);
 }

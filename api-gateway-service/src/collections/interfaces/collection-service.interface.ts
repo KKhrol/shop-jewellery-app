@@ -11,7 +11,7 @@ export interface ICollectionsService {
 
   findMany(data: CollectionsOnPage): Observable<Collection>;
 
-  postOne(data: CreateCollectionDto): Observable<Collection>;
+  postCollection(data: CreateCollectionDto): Observable<Collection>;
 
   updateOne(data: UpdateCollectionDto): Observable<Collection>;
 
