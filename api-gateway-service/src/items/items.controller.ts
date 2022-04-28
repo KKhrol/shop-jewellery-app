@@ -80,21 +80,29 @@ export class ItemsController implements OnModuleInit {
   }
 
   @Put(':id')
-  updateItem(
-    @Param('id') id: string,
-    @Body() updateItemAndInventoryDto: UpdateItemAndInventoryDto,
-  ) {
-    const updateItemDto: UpdateItemDto = updateItemAndInventoryDto;
-    updateItemDto.id = id;
+  updateItem(@Param('id') id: string, @Body() data: UpdateItemAndInventoryDto) {
+    const updateItemDto = {
+      name: data.name,
+      descriptionJewellery: data.descriptionJewellery,
+      collectionId: data.collectionId,
+      price: data.price,
+      descriptionItem: data.descriptionItem,
+      delivery: data.delivery,
+      images: data.images,
+      id: id,
+    };
     const updatedItem = this.itemsService.updateOne(updateItemDto);
 
-    let updatedInventory: Observable<Inventory>;
-    if (updateItemAndInventoryDto.quantity) {
+    const updatedInventory = this.inventoryService.updateOne({
+      id: id,
+      quantity: data.quantity,
+    });
+    /*if (updateItemAndInventoryDto.quantity) {
       updatedInventory = this.inventoryService.updateOne({
         id: id,
         quantity: updateItemAndInventoryDto.quantity,
       });
-    }
+    }*/
     return forkJoin([updatedItem, updatedInventory]);
   }
 }

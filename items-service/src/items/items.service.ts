@@ -127,6 +127,9 @@ export class ItemsService {
           take: 1,
         },
       },
+      orderBy: {
+        updatedAt: 'desc',
+      },
       skip: page * itemsPerPage,
       take: itemsPerPage,
     });
@@ -270,7 +273,21 @@ export class ItemsService {
 
   //not fully implemented. need to think over.
   async updateItem(data: UpdateItemDto): Promise<ItemOutputDto> {
-    const item = await this.prisma.item.update({
+    if (data.images) {
+      await this.prisma.image.deleteMany({
+        where: {
+          itemId: data.id,
+        },
+      });
+      await this.prisma.image.createMany({
+        data: Array.from(data.images).map((image) => ({
+          imageURL: image,
+          itemId: data.id,
+        })),
+      });
+    }
+
+    let item = await this.prisma.item.update({
       where: {
         id: data.id,
       },
@@ -278,30 +295,6 @@ export class ItemsService {
         price: data.price,
         description: data.descriptionItem,
         delivery: data.delivery,
-        jewellery: {
-          update: {
-            name: data.name,
-            description: data.descriptionJewellery,
-            collectionId: data.collectionId,
-          },
-        },
-        metal: {
-          connectOrCreate: {
-            where: {
-              name: data.metalName,
-            },
-            create: {
-              name: data.metalName,
-              care: data.care,
-              image: data.metalImage,
-            },
-          },
-        },
-        image: {
-          create: Array.from(data.images).map((image) => ({
-            imageURL: image,
-          })),
-        },
       },
       include: {
         jewellery: true,
@@ -309,6 +302,55 @@ export class ItemsService {
         metal: true,
       },
     });
+
+    // Is there a need to delete "old" jewellery, in case we create the new one?
+    if (data.name) {
+      item = await this.prisma.item.update({
+        where: {
+          id: data.id,
+        },
+        data: {
+          jewellery: {
+            connectOrCreate: {
+              where: {
+                name: data.name,
+              },
+              create: {
+                name: data.name,
+                description: data.descriptionJewellery,
+                collectionId: data.collectionId,
+              },
+            },
+          },
+        },
+        include: {
+          jewellery: true,
+          image: true,
+          metal: true,
+        },
+      });
+    }
+
+    if (data.descriptionJewellery || data.collectionId) {
+      item = await this.prisma.item.update({
+        where: {
+          id: data.id,
+        },
+        data: {
+          jewellery: {
+            update: {
+              description: data.descriptionJewellery,
+              collectionId: data.collectionId,
+            },
+          },
+        },
+        include: {
+          jewellery: true,
+          image: true,
+          metal: true,
+        },
+      });
+    }
 
     const images = Array<string>();
 

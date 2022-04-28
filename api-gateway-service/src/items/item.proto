@@ -73,17 +73,14 @@ message UpsertedItem {
 }
 
 message UpdateItemDto {
-    string id = 1;
-    string name = 2;        
-    string descriptionJewellery = 3;
-    string collectionId = 4; 
-    string metalName = 5;        
-    string metalImage = 6; 
-    string care = 7; 
-    int32 price = 8;
-    string descriptionItem = 9;
-    string delivery = 10; 
-    repeated string images = 11;
+    string name = 1;        
+    string descriptionJewellery = 2;
+    string collectionId = 3; 
+    int32 price = 4;
+    string descriptionItem = 5;
+    string delivery = 6; 
+    repeated string images = 7;
+    string id = 8;
 }
 
 message DeleteResponse {

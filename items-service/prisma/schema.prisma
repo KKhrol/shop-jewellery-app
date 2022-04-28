@@ -41,8 +41,8 @@ model Image {
 model Metal {
   id    String @id @default(uuid())
   name  String @unique
-  care  String
-  image String
+  care  String @default("No care instructions provided")
+  image String @default("No image provided")
 
   @@map("metals")
   Item Item[]
@@ -51,7 +51,7 @@ model Metal {
 model Jewellery {
   id           String @id @default(uuid())
   name         String @unique
-  description  String
+  description  String @default("No description provided")
   collectionId String?
 
   @@map("jewelleries")

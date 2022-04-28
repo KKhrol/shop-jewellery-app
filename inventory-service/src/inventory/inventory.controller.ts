@@ -4,6 +4,7 @@ import { CreateInventoryDto } from './interfaces/create-inventory.interface';
 import { DeleteInventoryDto } from './interfaces/deleted-inventory-output';
 import { InventoryByItemId } from './interfaces/inventory-by-item-id.interface';
 import { Inventory } from './interfaces/inventory.interface';
+import { UpdateInventoryDto } from './interfaces/update-inventory.interface';
 import { InventoryService } from './inventory.service';
 
 @Controller()
@@ -25,7 +26,7 @@ export class InventoryController {
   }
 
   @GrpcMethod('InventoryController', 'UpdateOne')
-  async updateOne(data: CreateInventoryDto): Promise<Inventory> {
+  async updateOne(data: UpdateInventoryDto): Promise<Inventory> {
     return this.inventoryService.updateItemInventory(data);
   }
 }
