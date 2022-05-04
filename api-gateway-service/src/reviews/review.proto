@@ -5,10 +5,18 @@ package review;
 service ReviewsController {
     rpc FindOne (ReviewByItemId) returns (Review);
     rpc DeleteOne (ReviewByItemId) returns (DeleteResponse);
+    rpc FindMany (ReviewsByUserId) returns (stream Reviews);
+    rpc DeleteManyItems(ReviewsByUserId) returns (DeleteResponse);
+    rpc AddOne(CreateReviewDto) returns (Review);
+    rpc UpdateOne(UpdateReviewDto) returns (Review);
 }
 
 message ReviewByItemId {
     string id = 1;
+}
+
+message ReviewsByUserId {
+    string userId = 1;
 }
 
 message Review {
@@ -18,4 +26,27 @@ message Review {
 
 message DeleteResponse {
     string message = 1;
+}
+
+message Reviews {
+    string itemId = 1;
+    double mark = 2;
+    string image = 3;
+    string name = 4;
+    string metalImage = 5;
+}
+
+message CreateReviewDto {
+    string itemId = 1;
+    string userId = 2;
+    double mark = 3;
+    string image = 4;
+    string name = 5;
+    string metalImage = 6;
+}
+
+message UpdateReviewDto {
+    string itemId = 1;
+    string userId = 2;
+    double mark = 3;
 }

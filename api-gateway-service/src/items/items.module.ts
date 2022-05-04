@@ -4,6 +4,7 @@ import { grpcClientReviewOptions } from '../grpc-client-options/grcp-client-revi
 import { grpcClientInventoryOptions } from '../grpc-client-options/grcp-client-inventory.options';
 import { grpcClientItemOptions } from '../grpc-client-options/grpc-client-item.options';
 import { ItemsController } from './items.controller';
+import { MetalsController } from './metals/metals.controller';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { ItemsController } from './items.controller';
       },
     ]),
   ],
-  controllers: [ItemsController],
+  controllers: [ItemsController, MetalsController],
 })
 export class ItemsModule {}

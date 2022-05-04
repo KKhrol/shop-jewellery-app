@@ -20,8 +20,10 @@ import { IReviewsService } from '../reviews/interfaces/review-service.interface'
 import { DeleteItemDto } from './interfaces/deleted-item-output.interface';
 import { IItemsService } from './interfaces/item-service.interface';
 import { Item } from './interfaces/item.interface';
-import { UpdateItemDto } from './interfaces/update-item.interface';
 import { UpdateItemAndInventoryDto } from '../common-interfaces/update-item-and-inventory.interface';
+import { CreateReviewDto } from '../reviews/interfaces/create-review.interface';
+import { UpdateReviewDto } from '../reviews/interfaces/update-review.interface';
+import { ItemOutputDto } from './interfaces/item-output.interface';
 
 @Controller('items')
 export class ItemsController implements OnModuleInit {
@@ -52,7 +54,12 @@ export class ItemsController implements OnModuleInit {
     return forkJoin([itemInfo, stock, reviews]);
   }
 
-  @Post(':id')
+  /*@Get(':id')
+  getItemByMetalId(@Param('id') itemId: string, @Query('metal') metalName: string) {
+    const id = this.itemsService;
+  }*/
+
+  @Post(':id/inventories')
   addItemInventory(
     @Param('id') itemId: string,
     @Body() inventory: Inventory,
@@ -63,6 +70,26 @@ export class ItemsController implements OnModuleInit {
     });
     const itemInfo = this.itemsService.findOne({ id: itemId });
     return forkJoin([itemInfo, stock]);
+  }
+
+  @Post(':id/reviews')
+  addItemReview(
+    @Param('id') itemId: string,
+    @Body() createReview: CreateReviewDto,
+  ): Observable<Review> {
+    createReview.itemId = itemId;
+    const reviewAdded = this.reviewsService.addOne(createReview);
+    return reviewAdded;
+  }
+
+  @Put(':id/reviews')
+  updateItemReview(
+    @Param('id') itemId: string,
+    @Body() updateReview: UpdateReviewDto,
+  ): Observable<Review> {
+    updateReview.itemId = itemId;
+    const reviewUpdated = this.reviewsService.updateOne(updateReview);
+    return reviewUpdated;
   }
 
   @Delete(':id')
@@ -80,7 +107,10 @@ export class ItemsController implements OnModuleInit {
   }
 
   @Put(':id')
-  updateItem(@Param('id') id: string, @Body() data: UpdateItemAndInventoryDto) {
+  updateItem(
+    @Param('id') id: string,
+    @Body() data: UpdateItemAndInventoryDto,
+  ): Observable<[ItemOutputDto, Inventory]> {
     const updateItemDto = {
       name: data.name,
       descriptionJewellery: data.descriptionJewellery,
@@ -97,12 +127,7 @@ export class ItemsController implements OnModuleInit {
       id: id,
       quantity: data.quantity,
     });
-    /*if (updateItemAndInventoryDto.quantity) {
-      updatedInventory = this.inventoryService.updateOne({
-        id: id,
-        quantity: updateItemAndInventoryDto.quantity,
-      });
-    }*/
+
     return forkJoin([updatedItem, updatedInventory]);
   }
 }

@@ -1,6 +1,18 @@
-import { Controller, Get, Inject, OnModuleInit, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  OnModuleInit,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { Observable, toArray } from 'rxjs';
+import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
+import { ReviewByUserId } from './interfaces/review-by-user-id.interface';
+import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
 import { IReviewsService } from './interfaces/review-service.interface';
 import { Review } from './interfaces/review.interface';
 
@@ -17,5 +29,16 @@ export class ReviewsController implements OnModuleInit {
   @Get(':id')
   findOne(@Param('id') id: string): Observable<Review> {
     return this.reviewsService.findOne({ id });
+  }
+
+  @Get()
+  findMany(@Body() data: ReviewByUserId): Observable<ReviewInUserRatingList[]> {
+    const stream = this.reviewsService.findMany(data);
+    return stream.pipe(toArray());
+  }
+
+  @Delete()
+  deleteManyItems(@Body() data: ReviewByUserId): Observable<DeleteReviewDto> {
+    return this.reviewsService.deleteManyItems(data);
   }
 }

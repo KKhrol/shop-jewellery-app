@@ -12,9 +12,21 @@ datasource db {
 
 model Review {
   userId    String  @default(uuid())
-  itemId  String    @default(uuid())
+  itemId  String
   mark     Float
+
+  item  Item  @relation(fields: [itemId], references: [id])
 
   @@id([userId, itemId])
   @@map("reviews")
+}
+
+model Item {
+  id  String @id @default(uuid())
+  image  String
+  name String
+  metalImage String
+
+  rating Review[]
+  @@map("items")
 }

@@ -10,10 +10,19 @@ import { Item } from './interfaces/item.interface';
 import { ItemsOnPage } from './interfaces/items-page.interface';
 import { ItemsService } from './items.service';
 import { UpdateItemDto } from './interfaces/update-item.interface';
+import { UpdateMetalDto } from './metals/interfaces/update-metal.interface';
+import { Metal } from './metals/interfaces/metal.interface';
+import { MetalById } from './metals/interfaces/metal-by-id.interface';
+import { DeleteMetalDto } from './metals/interfaces/deleted-metal-output.interface';
+import { CreateMetalDto } from './metals/interfaces/create-metal.interface';
+import { MetalsService } from './metals/metals.service';
 
 @Controller()
 export class ItemsController {
-  constructor(private readonly itemsService: ItemsService) {}
+  constructor(
+    private readonly itemsService: ItemsService,
+    private readonly metalsService: MetalsService,
+  ) {}
 
   @GrpcMethod('ItemsController', 'FindOne')
   async findOne(data: ItemById): Promise<Item> {
@@ -42,5 +51,25 @@ export class ItemsController {
   @GrpcMethod('ItemsController', 'UpdateOne')
   async updateOne(data: UpdateItemDto): Promise<ItemOutputDto> {
     return this.itemsService.updateItem(data);
+  }
+
+  @GrpcMethod('ItemsController', 'UpdateMetal')
+  async updateMetal(updateMetalDto: UpdateMetalDto): Promise<Metal> {
+    return this.metalsService.updateMetal(updateMetalDto);
+  }
+
+  @GrpcMethod('ItemsController', 'DeleteMetal')
+  async deleteMetal(data: MetalById): Promise<DeleteMetalDto> {
+    return this.metalsService.deleteMetal(data.id);
+  }
+
+  @GrpcMethod('ItemsController', 'AddMetal')
+  async addMetal(createMetalDto: CreateMetalDto): Promise<Metal> {
+    return this.metalsService.addMetal(createMetalDto);
+  }
+
+  @GrpcMethod('ItemsController', 'FindMetals')
+  async findMetals(): Promise<Observable<Metal>> {
+    return this.metalsService.getMetals();
   }
 }

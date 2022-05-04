@@ -8,6 +8,10 @@ service ItemsController {
     rpc PostOne (CreateItemDto) returns (UpsertedItem);
     rpc DeleteOne (ItemById) returns (DeleteResponse);
     rpc UpdateOne (UpdateItemDto) returns (UpsertedItem);
+    rpc UpdateMetal(MetalDto) returns (MetalDto);
+    rpc DeleteMetal(MetalById) returns (DeleteResponse);
+    rpc AddMetal(CreateMetalDto) returns (MetalDto);
+    rpc FindMetals(EmptyMessage) returns (stream MetalDto);
 }
 
 message ItemById {
@@ -85,4 +89,24 @@ message UpdateItemDto {
 
 message DeleteResponse {
     string message = 1;
+}
+
+message MetalDto {
+    string id = 1;
+    string name = 2;
+    string image = 3;
+    string care = 4;
+}
+
+message CreateMetalDto {
+    string name = 1;
+    string image = 2;
+    string care = 3;
+}
+
+message MetalById {
+    string id = 1;
+}
+message EmptyMessage {
+    
 }
