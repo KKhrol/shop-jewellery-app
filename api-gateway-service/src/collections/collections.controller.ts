@@ -81,7 +81,7 @@ export class CollectionsController implements OnModuleInit {
     return this.collectionsService.postCollection(createCollectionDto);
   }
 
-  @Post(':id')
+  @Post(':id/items')
   @HttpCode(HttpStatus.CREATED)
   postItemInCollection(
     @Param('id') collectionId: string,

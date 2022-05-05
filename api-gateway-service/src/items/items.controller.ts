@@ -24,6 +24,9 @@ import { UpdateItemAndInventoryDto } from '../common-interfaces/update-item-and-
 import { CreateReviewDto } from '../reviews/interfaces/create-review.interface';
 import { UpdateReviewDto } from '../reviews/interfaces/update-review.interface';
 import { ItemOutputDto } from './interfaces/item-output.interface';
+import { ICartsService } from '../carts/interfaces/cart-service.interface';
+import { CreateItemInCartDto } from '../carts/interfaces/create-item-in-cart.interface';
+import { Cart } from '../carts/interfaces/cart.interface';
 
 @Controller('items')
 export class ItemsController implements OnModuleInit {
@@ -31,11 +34,13 @@ export class ItemsController implements OnModuleInit {
     @Inject('ITEM_PACKAGE') private readonly clientItem: ClientGrpc,
     @Inject('REVIEW_PACKAGE') private readonly clientReview: ClientGrpc,
     @Inject('INVENTORY_PACKAGE') private readonly clientInventory: ClientGrpc,
+    @Inject('CART_PACKAGE') private readonly clientCart: ClientGrpc,
   ) {}
 
   private itemsService: IItemsService;
   private reviewsService: IReviewsService;
   private inventoryService: IInventoryService;
+  private cartsService: ICartsService;
   onModuleInit() {
     this.itemsService =
       this.clientItem.getService<IItemsService>('ItemsController');
@@ -44,6 +49,8 @@ export class ItemsController implements OnModuleInit {
     this.inventoryService = this.clientInventory.getService<IInventoryService>(
       'InventoryController',
     );
+    this.cartsService =
+      this.clientCart.getService<ICartsService>('CartsController');
   }
 
   @Get(':id')
@@ -82,6 +89,16 @@ export class ItemsController implements OnModuleInit {
     return reviewAdded;
   }
 
+  @Post(':id/carts')
+  addItemInCart(
+    @Param('id') itemId: string,
+    @Body() createItemInCart: CreateItemInCartDto,
+  ): Observable<Cart> {
+    createItemInCart.itemId = itemId;
+    const itemCreated = this.cartsService.addItem(createItemInCart);
+    return itemCreated;
+  }
+
   @Put(':id/reviews')
   updateItemReview(
     @Param('id') itemId: string,
@@ -95,14 +112,18 @@ export class ItemsController implements OnModuleInit {
   @Delete(':id')
   deleteItem(
     @Param('id') id: string,
-  ): Observable<[DeleteReviewDto, DeleteInventoryDto, DeleteItemDto]> {
+  ): Observable<
+    [DeleteReviewDto, DeleteInventoryDto, DeleteItemDto, DeleteItemDto]
+  > {
     const reviewsDeletedMessage = this.reviewsService.deleteOne({ id });
     const stockDeletedMessage = this.inventoryService.deleteOne({ id });
     const itemDeletedMessage = this.itemsService.deleteOne({ id });
+    const cartDeletedMessage = this.cartsService.deleteItem({ id });
     return forkJoin([
       reviewsDeletedMessage,
       stockDeletedMessage,
       itemDeletedMessage,
+      cartDeletedMessage,
     ]);
   }
 

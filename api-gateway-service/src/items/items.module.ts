@@ -5,6 +5,7 @@ import { grpcClientInventoryOptions } from '../grpc-client-options/grcp-client-i
 import { grpcClientItemOptions } from '../grpc-client-options/grpc-client-item.options';
 import { ItemsController } from './items.controller';
 import { MetalsController } from './metals/metals.controller';
+import { grpcClientCartOptions } from '../grpc-client-options/grpc-client-cart.options';
 
 @Module({
   imports: [
@@ -20,6 +21,10 @@ import { MetalsController } from './metals/metals.controller';
       {
         name: 'REVIEW_PACKAGE',
         ...grpcClientReviewOptions,
+      },
+      {
+        name: 'CART_PACKAGE',
+        ...grpcClientCartOptions,
       },
     ]),
   ],

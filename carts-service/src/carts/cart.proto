@@ -2,20 +2,61 @@ syntax = 'proto3';
 
 package cart;
 
-service CartsService {
+service CartsController {
     rpc FindOne (CartByUserId) returns (Cart);
+    rpc UpdateOne(UpdateCartDto) returns (Cart);
+    rpc DeleteItemFromCart(CartByItemId) returns (Cart);
+    rpc ClearCart(CartByUserId) returns (DeleteResponse);
+    rpc DeleteOneItem(CartById) returns (DeleteResponse);
+    rpc AddItem(CreateItemDto) returns (Cart);
 }
 
 message CartByUserId {
     string id = 1;
 }
 
+message CartByItemId {
+    string userId = 1;
+    string itemId = 2;
+}
+
+message CartById {
+    string id = 1;
+}
+
 message Cart {
     string userId = 1;
     repeated ItemInCart itemInCart = 2;
+    int32 varietyOfItems = 3;
+    int32 totalPrice = 4;
+}
+
+message UpdateCartDto {
+    string userId = 1;
+    string itemId = 2;
+    int32 quantity = 3;
+}
+
+message CreateItemDto {
+    string itemId = 1;
+    string userId = 2;
+    string image = 3;
+    string itemName = 4;
+    string description = 5;
+    string metalImage = 6;
+    int32 price = 7;
 }
 
 message ItemInCart {
-    string itemId = 1;
-    int32 quantity = 2;  
+    string id = 1;
+    string image = 2;
+    string itemName = 3;
+    string description = 4;
+    string metalImage = 5;
+    int32 price = 6;
+    int32 quantity = 7;
+}
+
+message DeleteResponse {
+    string message = 1;
 }
