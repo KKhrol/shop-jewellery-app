@@ -25,8 +25,9 @@ import { CreateReviewDto } from '../reviews/interfaces/create-review.interface';
 import { UpdateReviewDto } from '../reviews/interfaces/update-review.interface';
 import { ItemOutputDto } from './interfaces/item-output.interface';
 import { ICartsService } from '../carts/interfaces/cart-service.interface';
-import { CreateItemInCartDto } from '../carts/interfaces/create-item-in-cart.interface';
 import { Cart } from '../carts/interfaces/cart.interface';
+import { AddItemInCartDto } from '../common-interfaces/add-item-in-cart.interface';
+import { ItemInCart } from '../common-interfaces/item-in-cart.interface';
 
 @Controller('items')
 export class ItemsController implements OnModuleInit {
@@ -92,10 +93,10 @@ export class ItemsController implements OnModuleInit {
   @Post(':id/carts')
   addItemInCart(
     @Param('id') itemId: string,
-    @Body() createItemInCart: CreateItemInCartDto,
+    @Body() addItemInCart: AddItemInCartDto,
   ): Observable<Cart> {
-    createItemInCart.itemId = itemId;
-    const itemCreated = this.cartsService.addItem(createItemInCart);
+    addItemInCart.itemId = itemId;
+    const itemCreated = this.cartsService.addItem(addItemInCart);
     return itemCreated;
   }
 
@@ -131,7 +132,7 @@ export class ItemsController implements OnModuleInit {
   updateItem(
     @Param('id') id: string,
     @Body() data: UpdateItemAndInventoryDto,
-  ): Observable<[ItemOutputDto, Inventory]> {
+  ): Observable<[ItemOutputDto, Inventory, ItemInCart]> {
     const updateItemDto = {
       name: data.name,
       descriptionJewellery: data.descriptionJewellery,
@@ -149,6 +150,14 @@ export class ItemsController implements OnModuleInit {
       quantity: data.quantity,
     });
 
-    return forkJoin([updatedItem, updatedInventory]);
+    const updatedItemInCart = this.cartsService.updateItem({
+      id,
+      image: data.images[0],
+      itemName: data.name,
+      description: data.descriptionItem,
+      price: data.price,
+    });
+
+    return forkJoin([updatedItem, updatedInventory, updatedItemInCart]);
   }
 }

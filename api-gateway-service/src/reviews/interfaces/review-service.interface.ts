@@ -11,7 +11,7 @@ export interface IReviewsService {
   findOne(data: ReviewByItemId): Observable<Review>;
   deleteOne(data: ReviewByItemId): Observable<DeleteReviewDto>;
   findMany(data: ReviewByUserId): Observable<ReviewInUserRatingList>;
-  deleteManyItems(data: ReviewByUserId): Observable<DeleteReviewDto>;
+  deleteMany(data: ReviewByUserId): Observable<DeleteReviewDto>;
   addOne(data: CreateReviewDto): Observable<Review>;
   updateOne(data: UpdateReviewDto): Observable<Review>;
 }

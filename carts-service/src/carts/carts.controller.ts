@@ -5,21 +5,24 @@ import { CartById } from './interfaces/cart-by-id.interface';
 import { CartByItemId } from './interfaces/cart-by-item-id.interface';
 import { CartByUserId } from './interfaces/cart-by-user-id.interface';
 import { Cart } from './interfaces/cart.interface';
-import { CreateItemInCartDto } from './interfaces/create-item-in-cart.interface';
+import { AddItemInCartDto } from './interfaces/add-item-in-cart.interface';
 import { DeleteItemDto } from './interfaces/deleted-item-output.interface';
 import { UpdateCartDto } from './interfaces/update-cart.interface';
+import { UpdateItemDto } from './interfaces/update-item-in-cart.interface';
+import { ItemInCart } from './interfaces/item-in-cart.interface';
+import { CreateItemDto } from './interfaces/create-item-in-cart.interface';
 
 @Controller('carts')
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
-  @GrpcMethod('CartsController', 'FindOne')
-  async findOne(data: CartByUserId): Promise<Cart> {
+  @GrpcMethod('CartsController', 'FindCart')
+  async findCart(data: CartByUserId): Promise<Cart> {
     return this.cartsService.getCartByUserId(data.id);
   }
 
-  @GrpcMethod('CartsController', 'UpdateOne')
-  async updateOne(updateCartDto: UpdateCartDto): Promise<Cart> {
-    return this.cartsService.updateItemInCart(updateCartDto);
+  @GrpcMethod('CartsController', 'UpdateCart')
+  async updateCart(updateCartDto: UpdateCartDto): Promise<Cart> {
+    return this.cartsService.updateCart(updateCartDto);
   }
 
   @GrpcMethod('CartsController', 'DeleteItemFromCart')
@@ -32,13 +35,23 @@ export class CartsController {
     return this.cartsService.clearCart(data.id);
   }
 
-  @GrpcMethod('CartsController', 'DeleteOneItem')
-  async deleteOneItem(data: CartById): Promise<DeleteItemDto> {
+  @GrpcMethod('CartsController', 'DeleteItem')
+  async deleteItem(data: CartById): Promise<DeleteItemDto> {
     return this.cartsService.deleteItem(data.id);
   }
 
   @GrpcMethod('CartsController', 'AddItem')
-  async addItem(createItemInCart: CreateItemInCartDto): Promise<Cart> {
-    return this.cartsService.addItemInCart(createItemInCart);
+  async addItem(addItemInCart: AddItemInCartDto): Promise<Cart> {
+    return this.cartsService.addItem(addItemInCart);
+  }
+
+  @GrpcMethod('CartsController', 'UpdateItem')
+  async updateItem(updateItemDto: UpdateItemDto): Promise<ItemInCart> {
+    return this.cartsService.updateItem(updateItemDto);
+  }
+
+  @GrpcMethod('CartsController', 'CreateItem')
+  async createItem(createItemDto: CreateItemDto): Promise<ItemInCart> {
+    return this.cartsService.createItem(createItemDto);
   }
 }

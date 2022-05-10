@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
-import { grpcClientOrderOptions } from 'src/grpc-client-options/grpc-client-order.options';
+import { grpcClientOrderOptions } from '../grpc-client-options/grpc-client-order.options';
 import { OrdersController } from './orders.controller';
 
 @Module({

@@ -1,4 +1,5 @@
-export interface CreateItemDto {
+export interface ItemInCart {
+  id: string;
   image: string;
   itemName: string;
   description: string;

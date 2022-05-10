@@ -39,6 +39,6 @@ export class ReviewsController implements OnModuleInit {
 
   @Delete()
   deleteManyItems(@Body() data: ReviewByUserId): Observable<DeleteReviewDto> {
-    return this.reviewsService.deleteManyItems(data);
+    return this.reviewsService.deleteMany(data);
   }
 }

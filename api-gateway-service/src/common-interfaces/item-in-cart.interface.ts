@@ -1,6 +1,5 @@
-export interface CreateItemInCartDto {
-  itemId?: string;
-  userId: string;
+export interface ItemInCart {
+  id: string;
   image: string;
   itemName: string;
   description: string;

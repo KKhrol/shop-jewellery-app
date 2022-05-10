@@ -30,8 +30,8 @@ export class ReviewsController {
     return this.reviewsService.getRatingsByUserId(data.userId);
   }
 
-  @GrpcMethod('ReviewsController', 'DeleteManyItems')
-  async deleteManyItems(data: ReviewByUserId): Promise<DeleteReviewDto> {
+  @GrpcMethod('ReviewsController', 'DeleteMany')
+  async deleteMany(data: ReviewByUserId): Promise<DeleteReviewDto> {
     return this.reviewsService.deleteRatingsByUserId(data.userId);
   }
 

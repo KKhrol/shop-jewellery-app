@@ -6,7 +6,7 @@ service ReviewsController {
     rpc FindOne (ReviewByItemId) returns (Review);
     rpc DeleteOne (ReviewByItemId) returns (DeleteResponse);
     rpc FindMany (ReviewsByUserId) returns (stream Reviews);
-    rpc DeleteManyItems(ReviewsByUserId) returns (DeleteResponse);
+    rpc DeleteMany(ReviewsByUserId) returns (DeleteResponse);
     rpc AddOne(CreateReviewDto) returns (Review);
     rpc UpdateOne(UpdateReviewDto) returns (Review);
 }

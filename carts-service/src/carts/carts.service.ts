@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { create } from 'domain';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartByItemId } from './interfaces/cart-by-item-id.interface';
 import { Cart } from './interfaces/cart.interface';
-import { CreateItemInCartDto } from './interfaces/create-item-in-cart.interface';
+import { AddItemInCartDto } from './interfaces/add-item-in-cart.interface';
 import { DeleteItemDto } from './interfaces/deleted-item-output.interface';
 import { UpdateCartDto } from './interfaces/update-cart.interface';
+import { UpdateItemDto } from './interfaces/update-item-in-cart.interface';
+import { ItemInCart } from './interfaces/item-in-cart.interface';
+import { CreateItemDto } from './interfaces/create-item-in-cart.interface';
 
 @Injectable()
 export class CartsService {
@@ -44,7 +46,7 @@ export class CartsService {
     return result;
   }
 
-  async updateItemInCart(data: UpdateCartDto): Promise<Cart | null> {
+  async updateCart(data: UpdateCartDto): Promise<Cart | null> {
     //needs check that quantity is not 0. We're only updating quantity of the item. To delete item we have another function
     if (data.itemId) {
       const updatedCart = await this.prisma.cart.update({
@@ -72,7 +74,7 @@ export class CartsService {
     return { message: 'Items in cart were deleted!' };
   }
 
-  async removeItemFromCart(data: CartByItemId): Promise<Cart> {
+  async removeItemFromCart(data: CartByItemId): Promise<Cart | null> {
     const deletedItem = await this.prisma.cart.delete({
       where: {
         userId_itemId: {
@@ -117,7 +119,7 @@ export class CartsService {
     return { message: "That item didn't exist in cart database" };
   }
 
-  async addItemInCart(data: CreateItemInCartDto): Promise<Cart | null> {
+  async addItem(data: AddItemInCartDto): Promise<Cart | null> {
     if (data.itemId) {
       const item = await this.prisma.cart.upsert({
         where: {
@@ -154,5 +156,36 @@ export class CartsService {
       return this.getCartByUserId(data.userId);
     }
     return null;
+  }
+
+  async updateItem(data: UpdateItemDto): Promise<ItemInCart | null> {
+    const upsertedItem = await this.prisma.item.upsert({
+      where: {
+        id: data.id,
+      },
+      update: {
+        image: data.image,
+        itemName: data.itemName,
+        description: data.description,
+        metalImage: data.metalImage,
+        price: data.price,
+      },
+      create: {
+        id: data.id,
+        image: data.image,
+        itemName: data.itemName,
+        description: data.description,
+        metalImage: data.metalImage,
+        price: data.price,
+      },
+    });
+    return upsertedItem;
+  }
+
+  async createItem(data: CreateItemDto): Promise<ItemInCart | null> {
+    const createdItem = await this.prisma.item.create({
+      data: data,
+    });
+    return createdItem;
   }
 }

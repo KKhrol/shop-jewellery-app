@@ -1,11 +1,7 @@
-export interface Order {
-  orderId: string;
+export interface CreateOrderDto {
   userId: string;
-  varietyOfItems: number;
-  totalPrice: number;
   itemInOrder: ItemInOrder[];
-  createdAt: string;
-  updatedAt: string;
+  totalPrice: number;
 }
 
 interface ItemInOrder {

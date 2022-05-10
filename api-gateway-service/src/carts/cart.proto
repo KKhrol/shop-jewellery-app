@@ -3,12 +3,14 @@ syntax = 'proto3';
 package cart;
 
 service CartsController {
-    rpc FindOne (CartByUserId) returns (Cart);
-    rpc UpdateOne(UpdateCartDto) returns (Cart);
+    rpc FindCart (CartByUserId) returns (Cart);
+    rpc UpdateCart(UpdateCartDto) returns (Cart);
     rpc DeleteItemFromCart(CartByItemId) returns (Cart);
     rpc ClearCart(CartByUserId) returns (DeleteResponse);
-    rpc DeleteOneItem(CartById) returns (DeleteResponse);
-    rpc AddItem(CreateItemDto) returns (Cart);
+    rpc DeleteItem(CartById) returns (DeleteResponse);
+    rpc AddItem(AddItemDto) returns (Cart);
+    rpc UpdateItem(UpdateItemDto) returns (Item);
+    rpc CreateItem(CreateItemDto) returns (Item);
 }
 
 message CartByUserId {
@@ -37,7 +39,24 @@ message UpdateCartDto {
     int32 quantity = 3;
 }
 
+message UpdateItemDto {
+    string id = 1;
+    string image = 2;
+    string itemName = 3;
+    string description = 4;
+    string metalImage = 5;
+    int32 price = 6;
+}
+
 message CreateItemDto {
+    string image = 1;
+    string itemName = 2;
+    string description = 3;
+    string metalImage = 4;
+    int32 price = 5;
+}
+
+message AddItemDto {
     string itemId = 1;
     string userId = 2;
     string image = 3;
@@ -45,6 +64,15 @@ message CreateItemDto {
     string description = 5;
     string metalImage = 6;
     int32 price = 7;
+}
+
+message Item {
+    string id = 1;
+    string image = 2;
+    string itemName = 3;
+    string description = 4;
+    string metalImage = 5;
+    int32 price = 6;
 }
 
 message ItemInCart {

@@ -5,7 +5,7 @@ export interface Cart {
   totalPrice: number;
 }
 
-interface ItemInCart {
+export interface ItemInCart {
   id: string;
   image: string;
   itemName: string;
