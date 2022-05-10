@@ -12,35 +12,28 @@ datasource db {
 
 model Order {
   id        String    @id @default(uuid())
-  summary   Int
+  totalPrice   Int
   userId    String
+  deleted Boolean @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @default(now())
 
   @@map("orders")
-  items ItemInOrder[]
+  items Item[]
 }
 
 model Item {
-  id          String @id @default(uuid())
-  image       String
-  name        String
+  orderId  String
+  itemId   String
+  name String
+  quantity Int
+  image    String
   description String
   metalImage  String
   price       Int
 
-  @@map("items")
-  orders ItemInOrder[]
-}
-
-model ItemInOrder {
-  orderId  String
-  itemId   String
-  quantity Int
-
   order Order @relation(fields: [orderId], references: [id])
-  item  Item  @relation(fields: [itemId], references: [id])
 
   @@id([orderId, itemId])
-  @@map("item_in_order")
+  @@map("items")
 }
