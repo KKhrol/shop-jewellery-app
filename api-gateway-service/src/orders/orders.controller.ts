@@ -28,6 +28,22 @@ export class OrdersController implements OnModuleInit {
       this.client.getService<IOrdersService>('OrdersController');
   }
 
+  @Get('deleted')
+  getDeletedOrders(
+    @Query('page') numberOfPage: number,
+    @Body() orderById: GetOrderByIdDto,
+  ): Observable<OrderInList[]> {
+    const ordersPerPage = 10;
+    const page = Number(numberOfPage);
+    const stream = this.ordersService.findOrders({
+      userId: orderById.id,
+      page,
+      ordersPerPage,
+      deleted: true,
+    });
+    return stream.pipe(toArray());
+  }
+
   @Get(':id')
   getOrder(@Param('id') id: string): Observable<Order> {
     return this.ordersService.findOrder({ id });
@@ -48,22 +64,6 @@ export class OrdersController implements OnModuleInit {
     });
     return stream.pipe(toArray());
   }
-
-  /*@Get('deleted')
-  getDeletedOrders(
-    @Query('page') numberOfPage: number,
-    @Body() orderById: GetOrderByIdDto,
-  ): Observable<OrderInList[]> {
-    const ordersPerPage = 10;
-    const page = Number(numberOfPage);
-    const stream = this.ordersService.findOrders({
-      userId: orderById.id,
-      page,
-      ordersPerPage,
-      deleted: true,
-    });
-    return stream.pipe(toArray());
-  }*/
 
   @Put(':id')
   updateOrder(

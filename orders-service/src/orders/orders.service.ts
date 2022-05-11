@@ -14,6 +14,7 @@ import { UpdateOrderDto } from './interfaces/update-order.interface';
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
   async getOrderById(id: string): Promise<Order | null> {
+    console.log(id);
     const order = await this.prisma.order.findUnique({
       where: {
         id,
@@ -46,6 +47,7 @@ export class OrdersService {
   }
 
   async createOrder(data: CreateOrderDto): Promise<Order | null> {
+    console.log(data.itemInOrder);
     const orderCreated = await this.prisma.order.create({
       data: {
         totalPrice: data.totalPrice,
@@ -180,7 +182,9 @@ export class OrdersService {
         totalPrice: true,
       },
     });
-    const newTotalPrice = ((100 - data.discount) * order.totalPrice) / 100;
+    const newTotalPrice = Math.round(
+      ((100 - data.discount) * order.totalPrice) / 100,
+    );
     const orderUpdated = await this.prisma.order.update({
       where: {
         id: data.orderId,
