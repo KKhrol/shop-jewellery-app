@@ -3,15 +3,15 @@ syntax = "proto3";
 package item;
 
 service ItemsController {
-    rpc FindOne (ItemById) returns (Item);
-    rpc FindMany (ItemsPerPage) returns (stream ItemOnPage);
-    rpc PostOne (CreateItemDto) returns (UpsertedItem);
-    rpc DeleteOne (ItemById) returns (DeleteResponse);
-    rpc UpdateOne (UpdateItemDto) returns (UpsertedItem);
-    rpc UpdateMetal(MetalDto) returns (MetalDto);
-    rpc DeleteMetal(MetalById) returns (DeleteResponse);
-    rpc AddMetal(CreateMetalDto) returns (MetalDto);
-    rpc FindMetals(EmptyMessage) returns (stream MetalDto);
+    rpc FindOne (ItemById) returns (ResponseDataItem);
+    rpc FindMany (ItemsPerPage) returns (ResponseItemRepeated);
+    rpc PostOne (CreateItemDto) returns (ResponseDataUpsertedItem);
+    rpc DeleteOne (ItemById) returns (ResponseDataDeleted);
+    rpc UpdateOne (UpdateItemDto) returns (ResponseDataUpsertedItem);
+    rpc UpdateMetal(MetalDto) returns (ResponseDataMetal);
+    rpc DeleteMetal(MetalById) returns (ResponseDataDeleted);
+    rpc AddMetal(CreateMetalDto) returns (ResponseDataMetal);
+    rpc FindMetals(EmptyMessage) returns (ResponseMetalRepeated);
 }
 
 message ItemById {
@@ -61,7 +61,7 @@ message CreateItemDto {
     repeated string images = 10;
 }
 
-message UpsertedItem {
+message UpsertItemDto {
     string id = 1;
     string jewelleryId = 2;
     string name = 3;
@@ -109,4 +109,65 @@ message MetalById {
 }
 message EmptyMessage {
     
+}
+
+message ResponseDataItem {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Item data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseItemRepeated {
+    string status = 1;
+    string message = 2;
+    repeated ItemOnPage data = 3;
+    string error = 4;
+}
+
+message ResponseDataUpsertedItem {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        UpsertItemDto data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataUpdatedItem {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        UpdateItemDto data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataDeleted {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        DeleteResponse data = 3;
+        string error = 4;
+    }
+}
+
+
+message ResponseDataMetal {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        MetalDto data = 3;
+        string error = 4;
+    }
+}
+
+
+message ResponseMetalRepeated {
+    string status = 1;
+    string message = 2;
+    repeated MetalDto data = 3;
+    string error = 4;
 }

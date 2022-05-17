@@ -3,10 +3,10 @@ syntax = "proto3";
 package inventory;
 
 service InventoryController {
-    rpc FindOne (InventoryByItemId) returns (Inventory);
-    rpc PostOne (CreateInventoryDto) returns (Inventory);
-    rpc DeleteOne (InventoryByItemId) returns (DeleteResponse);
-    rpc UpdateOne (CreateInventoryDto) returns (Inventory);
+    rpc FindOne (InventoryByItemId) returns (ResponseDataInventory);
+    rpc PostOne (CreateInventoryDto) returns (ResponseDataInventory);
+    rpc DeleteOne (InventoryByItemId) returns (ResponseDataDeleted);
+    rpc UpdateOne (CreateInventoryDto) returns (ResponseDataInventory);
 }
 
 message InventoryByItemId {
@@ -24,4 +24,22 @@ message CreateInventoryDto {
 
 message DeleteResponse {
     string message = 1;
+}
+
+message ResponseDataInventory {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Inventory data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataDeleted {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        DeleteResponse data = 3;
+        string error = 4;
+    }
 }

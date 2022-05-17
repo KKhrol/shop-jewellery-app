@@ -3,14 +3,14 @@ syntax = 'proto3';
 package cart;
 
 service CartsController {
-    rpc FindCart (CartByUserId) returns (Cart);
-    rpc UpdateCart(UpdateCartDto) returns (Cart);
-    rpc DeleteItemFromCart(CartByItemId) returns (Cart);
-    rpc ClearCart(CartByUserId) returns (DeleteResponse);
-    rpc DeleteItem(CartById) returns (DeleteResponse);
-    rpc AddItem(AddItemDto) returns (Cart);
-    rpc UpdateItem(UpdateItemDto) returns (Item);
-    rpc CreateItem(CreateItemDto) returns (Item);
+    rpc FindCart (CartByUserId) returns (ResponseDataCart);
+    rpc UpdateCart(UpdateCartDto) returns (ResponseDataCart);
+    rpc DeleteItemFromCart(CartByItemId) returns (ResponseDataCart);
+    rpc ClearCart(CartByUserId) returns (ResponseDataCartDeleted);
+    rpc DeleteItem(CartById) returns (ResponseDataCartDeleted);
+    rpc AddItem(AddItemDto) returns (ResponseDataCart);
+    rpc UpdateItem(UpdateItemDto) returns (ResponseDataItem);
+    rpc CreateItem(CreateItemDto) returns (ResponseDataItem);
 }
 
 message CartByUserId {
@@ -87,4 +87,31 @@ message ItemInCart {
 
 message DeleteResponse {
     string message = 1;
+}
+
+message ResponseDataCart {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Cart data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataCartDeleted {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        DeleteResponse data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataItem {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Item data = 3;
+        string error = 4;
+    }
 }

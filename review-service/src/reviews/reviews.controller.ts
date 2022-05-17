@@ -1,8 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
 import { CreateReviewDto } from './interfaces/create-review.interface';
 import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
+import { ResponseData } from './interfaces/response-data.interface';
 import { ReviewByItemId } from './interfaces/review-by-item-id.interface';
 import { ReviewByUserId } from './interfaces/review-by-user-id.interface';
 import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
@@ -14,34 +14,66 @@ import { ReviewsService } from './reviews.service';
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
   @GrpcMethod('ReviewsController', 'FindOne')
-  async findOne(data: ReviewByItemId): Promise<Review> {
-    return this.reviewsService.getRatingByItemId(data.id);
+  async findOne(data: ReviewByItemId): Promise<ResponseData<Review>> {
+    return {
+      status: 'success',
+      message: 'Review found.',
+      data: await this.reviewsService.getRatingByItemId(data.id),
+    };
   }
 
   @GrpcMethod('ReviewsController', 'DeleteOne')
-  async deleteOne(data: ReviewByItemId): Promise<DeleteReviewDto> {
-    return this.reviewsService.deleteRatingByItemId(data.id);
+  async deleteOne(
+    data: ReviewByItemId,
+  ): Promise<ResponseData<DeleteReviewDto>> {
+    return {
+      status: 'success',
+      message: 'Reviews of item deleted.',
+      data: await this.reviewsService.deleteRatingByItemId(data.id),
+    };
   }
 
   @GrpcMethod('ReviewsController', 'FindMany')
   async findMany(
     data: ReviewByUserId,
-  ): Promise<Observable<ReviewInUserRatingList>> {
-    return this.reviewsService.getRatingsByUserId(data.userId);
+  ): Promise<ResponseData<ReviewInUserRatingList[]>> {
+    return {
+      status: 'success',
+      message: 'Reviews found.',
+      data: await this.reviewsService.getRatingsByUserId(data.userId),
+    };
   }
 
   @GrpcMethod('ReviewsController', 'DeleteMany')
-  async deleteMany(data: ReviewByUserId): Promise<DeleteReviewDto> {
-    return this.reviewsService.deleteRatingsByUserId(data.userId);
+  async deleteMany(
+    data: ReviewByUserId,
+  ): Promise<ResponseData<DeleteReviewDto>> {
+    return {
+      status: 'success',
+      message: 'Reviews of user deleted.',
+      data: await this.reviewsService.deleteRatingsByUserId(data.userId),
+    };
   }
 
   @GrpcMethod('ReviewsController', 'AddOne')
-  async addOne(createReviewDto: CreateReviewDto): Promise<Review> {
-    return this.reviewsService.createRating(createReviewDto);
+  async addOne(
+    createReviewDto: CreateReviewDto,
+  ): Promise<ResponseData<Review>> {
+    return {
+      status: 'success',
+      message: 'Review added.',
+      data: await this.reviewsService.createRating(createReviewDto),
+    };
   }
 
   @GrpcMethod('ReviewsController', 'UpdateOne')
-  async updateOne(updateReviewDto: UpdateReviewDto): Promise<Review> {
-    return this.reviewsService.updateRating(updateReviewDto);
+  async updateOne(
+    updateReviewDto: UpdateReviewDto,
+  ): Promise<ResponseData<Review>> {
+    return {
+      status: 'success',
+      message: 'Review updated.',
+      data: await this.reviewsService.updateRating(updateReviewDto),
+    };
   }
 }

@@ -8,24 +8,37 @@ import { UpdateCartDto } from './interfaces/update-cart.interface';
 import { UpdateItemDto } from './interfaces/update-item-in-cart.interface';
 import { ItemInCart } from './interfaces/item-in-cart.interface';
 import { CreateItemDto } from './interfaces/create-item-in-cart.interface';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class CartsService {
   constructor(private prisma: PrismaService) {}
-  async getCartByUserId(id: string): Promise<Cart | null> {
-    const cart = await this.prisma.cart.findMany({
-      where: {
-        userId: id,
-      },
-      include: {
-        item: true,
-      },
-    });
-    const countItems = await this.prisma.cart.count({
-      where: {
-        userId: id,
-      },
-    });
+  async getCartByUserId(id: string): Promise<Cart> {
+    const cart = await this.prisma.cart
+      .findMany({
+        where: {
+          userId: id,
+        },
+        include: {
+          item: true,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+
+    if (!cart) {
+      throw new RpcException('No carts were found.');
+    }
+    const countItems = await this.prisma.cart
+      .count({
+        where: {
+          userId: id,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
 
     const items = [];
 
@@ -46,10 +59,15 @@ export class CartsService {
     return result;
   }
 
-  async updateCart(data: UpdateCartDto): Promise<Cart | null> {
-    //needs check that quantity is not 0. We're only updating quantity of the item. To delete item we have another function
-    if (data.itemId) {
-      const updatedCart = await this.prisma.cart.update({
+  async updateCart(data: UpdateCartDto): Promise<Cart> {
+    if (data.quantity === 0) {
+      throw new RpcException('Quantity of the item should be > 0');
+    }
+    if (!data.itemId) {
+      throw new RpcException("The itemId wasn't provided.");
+    }
+    const updatedCart = await this.prisma.cart
+      .update({
         where: {
           userId_itemId: {
             userId: data.userId,
@@ -59,69 +77,114 @@ export class CartsService {
         data: {
           quantity: data.quantity,
         },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
       });
-      return this.getCartByUserId(data.userId);
+    if (!updatedCart) {
+      throw new RpcException("The cart wasn't updated.");
     }
-    return null;
+    return this.getCartByUserId(data.userId);
   }
 
   async clearCart(userId: string): Promise<DeleteItemDto> {
-    const deletedItems = await this.prisma.cart.deleteMany({
-      where: {
-        userId,
-      },
-    });
+    const deletedItems = await this.prisma.cart
+      .deleteMany({
+        where: {
+          userId,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+    if (!deletedItems) {
+      throw new RpcException("The cart wasn't cleared.");
+    }
     return { message: 'Items in cart were deleted!' };
   }
 
   async removeItemFromCart(data: CartByItemId): Promise<Cart | null> {
-    const deletedItem = await this.prisma.cart.delete({
-      where: {
-        userId_itemId: {
-          itemId: data.itemId,
-          userId: data.userId,
+    const deletedItem = await this.prisma.cart
+      .delete({
+        where: {
+          userId_itemId: {
+            itemId: data.itemId,
+            userId: data.userId,
+          },
         },
-      },
-    });
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+    if (!deletedItem) {
+      throw new RpcException("The item wasn't removed from cart.");
+    }
     return this.getCartByUserId(data.userId);
   }
 
   async deleteItem(id: string): Promise<DeleteItemDto> {
-    const item = await this.prisma.item.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    if (item) {
-      const itemInCarts = await this.prisma.cart.findMany({
-        where: {
-          itemId: id,
-        },
-      });
-
-      if (itemInCarts) {
-        const deletedItems = await this.prisma.cart.deleteMany({
-          where: {
-            itemId: id,
-          },
-        });
-      }
-
-      const deletedItem = await this.prisma.item.delete({
+    const item = await this.prisma.item
+      .findUnique({
         where: {
           id,
         },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
       });
-      return { message: 'The items in all carts were deleted!' };
+
+    if (!item) {
+      throw new RpcException(
+        "The item wasn't deleted, because it didn't exist.",
+      );
+    }
+    const itemInCarts = await this.prisma.cart
+      .findMany({
+        where: {
+          itemId: id,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+
+    if (itemInCarts) {
+      const deletedItems = await this.prisma.cart
+        .deleteMany({
+          where: {
+            itemId: id,
+          },
+        })
+        .catch((error) => {
+          throw new RpcException(error);
+        });
+      if (!deletedItems) {
+        throw new RpcException("The item wasn't deleted from carts.");
+      }
     }
 
-    return { message: "That item didn't exist in cart database" };
+    const deletedItem = await this.prisma.item
+      .delete({
+        where: {
+          id,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+
+    if (!deletedItem) {
+      throw new RpcException("The item wasn't deleted");
+    }
+    return { message: 'The items in all carts were deleted!' };
   }
 
-  async addItem(data: AddItemInCartDto): Promise<Cart | null> {
-    if (data.itemId) {
-      const item = await this.prisma.cart.upsert({
+  async addItem(data: AddItemInCartDto): Promise<Cart> {
+    if (!data.itemId) {
+      throw new RpcException("The itemId wasn't provided.");
+    }
+    const item = await this.prisma.cart
+      .upsert({
         where: {
           userId_itemId: {
             userId: data.userId,
@@ -152,40 +215,58 @@ export class CartsService {
             },
           },
         },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
       });
-      return this.getCartByUserId(data.userId);
+    if (!item) {
+      throw new RpcException("The item wasn't added.");
     }
-    return null;
+    return this.getCartByUserId(data.userId);
   }
 
-  async updateItem(data: UpdateItemDto): Promise<ItemInCart | null> {
-    const upsertedItem = await this.prisma.item.upsert({
-      where: {
-        id: data.id,
-      },
-      update: {
-        image: data.image,
-        itemName: data.itemName,
-        description: data.description,
-        metalImage: data.metalImage,
-        price: data.price,
-      },
-      create: {
-        id: data.id,
-        image: data.image,
-        itemName: data.itemName,
-        description: data.description,
-        metalImage: data.metalImage,
-        price: data.price,
-      },
-    });
+  async updateItem(data: UpdateItemDto): Promise<ItemInCart> {
+    const upsertedItem = await this.prisma.item
+      .upsert({
+        where: {
+          id: data.id,
+        },
+        update: {
+          image: data.image,
+          itemName: data.itemName,
+          description: data.description,
+          metalImage: data.metalImage,
+          price: data.price,
+        },
+        create: {
+          id: data.id,
+          image: data.image,
+          itemName: data.itemName,
+          description: data.description,
+          metalImage: data.metalImage,
+          price: data.price,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+    if (!upsertedItem) {
+      throw new RpcException("The item wasn't updated.");
+    }
     return upsertedItem;
   }
 
-  async createItem(data: CreateItemDto): Promise<ItemInCart | null> {
-    const createdItem = await this.prisma.item.create({
-      data: data,
-    });
+  async createItem(data: CreateItemDto): Promise<ItemInCart> {
+    const createdItem = await this.prisma.item
+      .create({
+        data: data,
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
+    if (!createdItem) {
+      throw new RpcException("The item wasn't created.");
+    }
     return createdItem;
   }
 }

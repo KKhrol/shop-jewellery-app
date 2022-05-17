@@ -3,12 +3,12 @@ syntax = 'proto3';
 package order;
 
 service OrdersController {
-    rpc FindOrder (GetOrderByIdDto) returns (Order);
-    rpc CreateOrder(CreateOrderDto) returns (Order);
-    rpc FindOrders(GetOrdersDto) returns (stream OrderInList);
-    rpc UpdateOrder(UpdateOrderDto) returns (Order);
-    rpc DeleteItem(DeleteItemInOrderDto) returns (MessageResponse);
-    rpc DeleteOrder(DeleteOrderDto) returns (MessageResponse);
+    rpc FindOrder (GetOrderByIdDto) returns (ResponseDataOrder);
+    rpc CreateOrder(CreateOrderDto) returns (ResponseDataOrder);
+    rpc FindOrders(GetOrdersDto) returns (ResponseOrderRepeated);
+    rpc UpdateOrder(UpdateOrderDto) returns (ResponseDataOrder);
+    rpc DeleteItem(DeleteItemInOrderDto) returns (ResponseOrderMessage);
+    rpc DeleteOrder(DeleteOrderDto) returns (ResponseOrderMessage);
 }
 
 message GetOrderByIdDto {
@@ -69,6 +69,31 @@ message ItemInOrder {
     int32 quantity = 7; 
 }
 
-message MessageResponse {
+message Message {
     string message = 1;
+}
+
+message ResponseDataOrder {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Order data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseOrderRepeated {
+    string status = 1;
+    string message = 2;
+    repeated OrderInList data = 3;
+    string error = 4;
+}
+
+message ResponseOrderMessage {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Message data = 3;
+        string error = 4;
+    }
 }

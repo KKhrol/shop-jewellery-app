@@ -28,6 +28,8 @@ import { ICartsService } from '../carts/interfaces/cart-service.interface';
 import { Cart } from '../carts/interfaces/cart.interface';
 import { AddItemInCartDto } from '../common-interfaces/add-item-in-cart.interface';
 import { ItemInCart } from '../common-interfaces/item-in-cart.interface';
+import { ResponseData } from '../common-interfaces/response-data.interface';
+import { ResponseError } from '../common-interfaces/response-error.interface';
 
 @Controller('items')
 export class ItemsController implements OnModuleInit {
@@ -55,23 +57,31 @@ export class ItemsController implements OnModuleInit {
   }
 
   @Get(':id')
-  getItemInfo(@Param('id') id: string): Observable<[Item, Inventory, Review]> {
+  getItemInfo(
+    @Param('id') id: string,
+  ): Observable<
+    [
+      ResponseData<Item> | ResponseError,
+      ResponseData<Inventory> | ResponseError,
+      ResponseData<Review> | ResponseError,
+    ]
+  > {
     const reviews = this.reviewsService.findOne({ id });
     const stock = this.inventoryService.findOne({ id });
     const itemInfo = this.itemsService.findOne({ id });
     return forkJoin([itemInfo, stock, reviews]);
   }
 
-  /*@Get(':id')
-  getItemByMetalId(@Param('id') itemId: string, @Query('metal') metalName: string) {
-    const id = this.itemsService;
-  }*/
-
   @Post(':id/inventories')
   addItemInventory(
     @Param('id') itemId: string,
     @Body() inventory: Inventory,
-  ): Observable<[Item, Inventory]> {
+  ): Observable<
+    [
+      ResponseData<Item> | ResponseError,
+      ResponseData<Inventory> | ResponseError,
+    ]
+  > {
     const stock = this.inventoryService.postOne({
       id: itemId,
       quantity: inventory.quantity,
@@ -84,7 +94,7 @@ export class ItemsController implements OnModuleInit {
   addItemReview(
     @Param('id') itemId: string,
     @Body() createReview: CreateReviewDto,
-  ): Observable<Review> {
+  ): Observable<ResponseData<Review> | ResponseError> {
     createReview.itemId = itemId;
     const reviewAdded = this.reviewsService.addOne(createReview);
     return reviewAdded;
@@ -94,7 +104,7 @@ export class ItemsController implements OnModuleInit {
   addItemInCart(
     @Param('id') itemId: string,
     @Body() addItemInCart: AddItemInCartDto,
-  ): Observable<Cart> {
+  ): Observable<ResponseData<Cart> | ResponseError> {
     addItemInCart.itemId = itemId;
     const itemCreated = this.cartsService.addItem(addItemInCart);
     return itemCreated;
@@ -104,7 +114,7 @@ export class ItemsController implements OnModuleInit {
   updateItemReview(
     @Param('id') itemId: string,
     @Body() updateReview: UpdateReviewDto,
-  ): Observable<Review> {
+  ): Observable<ResponseData<Review> | ResponseError> {
     updateReview.itemId = itemId;
     const reviewUpdated = this.reviewsService.updateOne(updateReview);
     return reviewUpdated;
@@ -132,7 +142,13 @@ export class ItemsController implements OnModuleInit {
   updateItem(
     @Param('id') id: string,
     @Body() data: UpdateItemAndInventoryDto,
-  ): Observable<[ItemOutputDto, Inventory, ItemInCart]> {
+  ): Observable<
+    [
+      ResponseData<ItemOutputDto> | ResponseError,
+      ResponseData<Inventory> | ResponseError,
+      ResponseData<ItemInCart> | ResponseError,
+    ]
+  > {
     const updateItemDto = {
       name: data.name,
       descriptionJewellery: data.descriptionJewellery,

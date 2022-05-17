@@ -3,12 +3,12 @@ syntax = "proto3";
 package review;
 
 service ReviewsController {
-    rpc FindOne (ReviewByItemId) returns (Review);
-    rpc DeleteOne (ReviewByItemId) returns (DeleteResponse);
-    rpc FindMany (ReviewsByUserId) returns (stream Reviews);
-    rpc DeleteMany(ReviewsByUserId) returns (DeleteResponse);
-    rpc AddOne(CreateReviewDto) returns (Review);
-    rpc UpdateOne(UpdateReviewDto) returns (Review);
+    rpc FindOne (ReviewByItemId) returns (ResponseDataReview);
+    rpc DeleteOne (ReviewByItemId) returns (ResponseReviewDeleted);
+    rpc FindMany (ReviewsByUserId) returns (ResponseReviewRepeated);
+    rpc DeleteMany(ReviewsByUserId) returns (ResponseReviewDeleted);
+    rpc AddOne(CreateReviewDto) returns (ResponseDataReview);
+    rpc UpdateOne(UpdateReviewDto) returns (ResponseDataReview);
 }
 
 message ReviewByItemId {
@@ -49,4 +49,29 @@ message UpdateReviewDto {
     string itemId = 1;
     string userId = 2;
     double mark = 3;
+}
+
+message ResponseDataReview {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Review data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseReviewRepeated {
+    string status = 1;
+    string message = 2;
+    repeated Reviews data = 3;
+    string error = 4;
+}
+
+message ResponseReviewDeleted {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        DeleteResponse data = 3;
+        string error = 4;
+    }
 }

@@ -10,7 +10,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, toArray } from 'rxjs';
+import { Observable } from 'rxjs';
+import { ResponseData } from '../common-interfaces/response-data.interface';
+import { ResponseError } from '../common-interfaces/response-error.interface';
 import { DeleteItemDto } from '../items/interfaces/deleted-item-output.interface';
 import { DeletedOrderOutputDto } from './interfaces/deleted-order-output.interface';
 import { GetOrderByIdDto } from './interfaces/get-order-by-id.interface';
@@ -32,20 +34,22 @@ export class OrdersController implements OnModuleInit {
   getDeletedOrders(
     @Query('page') numberOfPage: number,
     @Body() orderById: GetOrderByIdDto,
-  ): Observable<OrderInList[]> {
+  ): Observable<ResponseData<OrderInList[]> | ResponseError> {
     const ordersPerPage = 10;
     const page = Number(numberOfPage);
-    const stream = this.ordersService.findOrders({
+    const orders = this.ordersService.findOrders({
       userId: orderById.id,
       page,
       ordersPerPage,
       deleted: true,
     });
-    return stream.pipe(toArray());
+    return orders;
   }
 
   @Get(':id')
-  getOrder(@Param('id') id: string): Observable<Order> {
+  getOrder(
+    @Param('id') id: string,
+  ): Observable<ResponseData<Order> | ResponseError> {
     return this.ordersService.findOrder({ id });
   }
 
@@ -53,29 +57,31 @@ export class OrdersController implements OnModuleInit {
   getOrders(
     @Query('page') numberOfPage: number,
     @Body() orderById: GetOrderByIdDto,
-  ): Observable<OrderInList[]> {
+  ): Observable<ResponseData<OrderInList[]> | ResponseError> {
     const ordersPerPage = 10;
     const page = Number(numberOfPage);
-    const stream = this.ordersService.findOrders({
+    const orders = this.ordersService.findOrders({
       userId: orderById.id,
       page,
       ordersPerPage,
       deleted: false,
     });
-    return stream.pipe(toArray());
+    return orders;
   }
 
   @Put(':id')
   updateOrder(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
-  ): Observable<Order> {
+  ): Observable<ResponseData<Order> | ResponseError> {
     updateOrderDto.orderId = id;
     return this.ordersService.updateOrder(updateOrderDto);
   }
 
   @Delete(':id')
-  deleteOrder(@Param('id') id: string): Observable<DeletedOrderOutputDto> {
+  deleteOrder(
+    @Param('id') id: string,
+  ): Observable<ResponseData<DeletedOrderOutputDto> | ResponseError> {
     return this.ordersService.deleteOrder({ id });
   }
 
@@ -83,7 +89,7 @@ export class OrdersController implements OnModuleInit {
   deleteItem(
     @Param('id') orderId: string,
     @Param('itemId') itemId: string,
-  ): Observable<DeleteItemDto> {
+  ): Observable<ResponseData<DeleteItemDto> | ResponseError> {
     return this.ordersService.deleteItem({ orderId, itemId });
   }
 }

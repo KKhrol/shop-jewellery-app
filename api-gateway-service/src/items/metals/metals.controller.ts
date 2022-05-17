@@ -10,7 +10,9 @@ import {
   Get,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, toArray } from 'rxjs';
+import { Observable } from 'rxjs';
+import { ResponseData } from '../../common-interfaces/response-data.interface';
+import { ResponseError } from '../../common-interfaces/response-error.interface';
 import { IItemsService } from '../interfaces/item-service.interface';
 import { CreateMetalDto } from './interfaces/create-metal.interface';
 import { DeleteMetalDto } from './interfaces/deleted-metal-output.interface';
@@ -32,7 +34,7 @@ export class MetalsController implements OnModuleInit {
   updateMetal(
     @Param('id') id: string,
     @Body() updateMetalDto: UpdateMetalDto,
-  ): Observable<Metal> {
+  ): Observable<ResponseData<Metal> | ResponseError> {
     updateMetalDto.id = id;
     const metalUpdated = this.itemsService.updateMetal(updateMetalDto);
     return metalUpdated;
@@ -44,14 +46,15 @@ export class MetalsController implements OnModuleInit {
   }
 
   @Post()
-  addMetal(@Body() createMetalDto: CreateMetalDto): Observable<Metal> {
+  addMetal(
+    @Body() createMetalDto: CreateMetalDto,
+  ): Observable<ResponseData<Metal> | ResponseError> {
     const metalAdded = this.itemsService.addMetal(createMetalDto);
     return metalAdded;
   }
 
   @Get()
-  findMetals(): Observable<Metal[]> {
-    const stream = this.itemsService.findMetals();
-    return stream.pipe(toArray());
+  findMetals(): Observable<ResponseData<Metal[]> | ResponseError> {
+    return this.itemsService.findMetals();
   }
 }

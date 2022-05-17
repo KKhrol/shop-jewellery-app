@@ -3,11 +3,19 @@ syntax = "proto3";
 package collection;
 
 service CollectionsController {
-    rpc FindOne (CollectionById) returns (Collection);
-    rpc FindMany (CollectionsOnPage) returns (stream Collection);
-    rpc PostCollection (CollectionDto) returns (CollectionFullInfo);
-    rpc UpdateOne (Collection) returns (CollectionFullInfo);
-    rpc DeleteOne (CollectionById) returns (DeleteResponse);
+    rpc FindOne (CollectionById) returns (ResponseDataCollectionFullInfo);
+    rpc FindMany (CollectionsOnPage) returns (ResponseRepeatedData);
+    rpc PostCollection (CollectionDto) returns (ResponseDataCollection);
+    rpc UpdateOne (Collection) returns (ResponseDataCollection);
+    rpc DeleteOne (CollectionById) returns (ResponseDataCollectionDeleted);
+}
+
+
+message ResponseRepeatedData {
+    string status = 1;
+    string message = 2;
+    repeated Collection data = 3;
+    string error = 4;
 }
 
 message CollectionById {
@@ -38,9 +46,36 @@ message CollectionDto {
 
 message CollectionsOnPage {
     int32 page = 1;
-    int32 itemsPerPage = 2;
+    int32 items_per_page = 2;
 }
 
 message DeleteResponse {
     string message = 1;
+}
+
+message ResponseDataCollection {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        Collection data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataCollectionFullInfo {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        CollectionFullInfo data = 3;
+        string error = 4;
+    }
+}
+
+message ResponseDataCollectionDeleted {
+    string status = 1;
+    string message = 2;
+    oneof response {
+        DeleteResponse data = 3;
+        string error = 4;
+    }
 }

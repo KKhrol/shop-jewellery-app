@@ -1,4 +1,6 @@
 import { Observable } from 'rxjs';
+import { ResponseData } from '../../common-interfaces/response-data.interface';
+import { ResponseError } from '../../common-interfaces/response-error.interface';
 import { CreateReviewDto } from './create-review.interface';
 import { DeleteReviewDto } from './deleted-review-output.interface';
 import { ReviewByItemId } from './review-by-item-id.interface';
@@ -8,10 +10,22 @@ import { Review } from './review.interface';
 import { UpdateReviewDto } from './update-review.interface';
 
 export interface IReviewsService {
-  findOne(data: ReviewByItemId): Observable<Review>;
-  deleteOne(data: ReviewByItemId): Observable<DeleteReviewDto>;
-  findMany(data: ReviewByUserId): Observable<ReviewInUserRatingList>;
-  deleteMany(data: ReviewByUserId): Observable<DeleteReviewDto>;
-  addOne(data: CreateReviewDto): Observable<Review>;
-  updateOne(data: UpdateReviewDto): Observable<Review>;
+  findOne(
+    data: ReviewByItemId,
+  ): Observable<ResponseData<Review> | ResponseError>;
+  deleteOne(
+    data: ReviewByItemId,
+  ): Observable<ResponseData<DeleteReviewDto> | ResponseError>;
+  findMany(
+    data: ReviewByUserId,
+  ): Observable<ResponseData<ReviewInUserRatingList[]> | ResponseError>;
+  deleteMany(
+    data: ReviewByUserId,
+  ): Observable<ResponseData<DeleteReviewDto> | ResponseError>;
+  addOne(
+    data: CreateReviewDto,
+  ): Observable<ResponseData<Review> | ResponseError>;
+  updateOne(
+    data: UpdateReviewDto,
+  ): Observable<ResponseData<Review> | ResponseError>;
 }

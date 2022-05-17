@@ -13,7 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { forkJoin, Observable, toArray } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { CreateCollectionDto } from './interfaces/create-collection.interface';
 import { ICollectionsService } from './interfaces/collection-service.interface';
 import { Collection } from './interfaces/collection.interface';
@@ -24,6 +24,9 @@ import { ItemInCollection } from '../items/interfaces/item-in-collection.interfa
 import { CreateItemInCollection } from '../common-interfaces/create-item-in-collection.interface';
 import { CreateItemDto } from '../items/interfaces/create-item.interface';
 import { ItemOutputDto } from '../items/interfaces/item-output.interface';
+import { ResponseData } from '../common-interfaces/response-data.interface';
+import { ResponseError } from '../common-interfaces/response-error.interface';
+import { CollectionFullInfo } from './interfaces/collection-full-info.interface';
 
 @Controller('collections')
 export class CollectionsController implements OnModuleInit {
@@ -47,16 +50,20 @@ export class CollectionsController implements OnModuleInit {
   getCollection(
     @Param('id') collectionId: string,
     @Query('page') numberOfPage: number,
-  ): Observable<[Collection, ItemInCollection[]]> {
+  ): Observable<
+    [
+      ResponseData<CollectionFullInfo> | ResponseError,
+      ResponseData<ItemInCollection[]> | ResponseError,
+    ]
+  > {
     const itemsPerPage = 3;
     const page = Number(numberOfPage);
 
-    const stream = this.itemsService.findMany({
+    const items = this.itemsService.findMany({
       page,
       itemsPerPage,
       collectionId,
     });
-    const items = stream.pipe(toArray());
     const collection = this.collectionsService.findOne({ id: collectionId });
 
     return forkJoin([collection, items]);
@@ -65,20 +72,25 @@ export class CollectionsController implements OnModuleInit {
   @Get()
   getCollections(
     @Query('page') numberOfPage: number,
-  ): Observable<Collection[]> {
+  ): Observable<ResponseData<Collection[]> | ResponseError> {
     const itemsPerPage = 20;
     const page = Number(numberOfPage);
 
-    const stream = this.collectionsService.findMany({ page, itemsPerPage });
-    return stream.pipe(toArray());
+    const collections = this.collectionsService.findMany({
+      page,
+      itemsPerPage,
+    });
+    return collections;
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   postCollection(
     @Body() createCollectionDto: CreateCollectionDto,
-  ): Observable<Collection> {
-    return this.collectionsService.postCollection(createCollectionDto);
+  ): Observable<ResponseData<Collection> | ResponseError> {
+    const collectionCreated =
+      this.collectionsService.postCollection(createCollectionDto);
+    return collectionCreated;
   }
 
   @Post(':id/items')
@@ -86,7 +98,7 @@ export class CollectionsController implements OnModuleInit {
   postItemInCollection(
     @Param('id') collectionId: string,
     @Body() createItemInCollection: CreateItemInCollection,
-  ): Observable<ItemOutputDto> {
+  ): Observable<ResponseData<ItemOutputDto> | ResponseError> {
     const createItem: CreateItemDto = createItemInCollection;
     createItem.collectionId = collectionId;
 
@@ -97,13 +109,18 @@ export class CollectionsController implements OnModuleInit {
   updateOne(
     @Param('id') id: string,
     @Body() updateCollectionDto: UpdateCollectionDto,
-  ): Observable<Collection> {
+  ): Observable<ResponseData<Collection> | ResponseError> {
     updateCollectionDto.id = id;
-    return this.collectionsService.updateOne(updateCollectionDto);
+    const updatedCollection =
+      this.collectionsService.updateOne(updateCollectionDto);
+    return updatedCollection;
   }
 
   @Delete(':id')
-  deleteOne(@Param('id') id: string): Observable<DeleteCollectionDto> {
-    return this.collectionsService.deleteOne({ id });
+  deleteOne(
+    @Param('id') id: string,
+  ): Observable<ResponseData<DeleteCollectionDto> | ResponseError> {
+    const deletedCollection = this.collectionsService.deleteOne({ id });
+    return deletedCollection;
   }
 }

@@ -9,12 +9,26 @@ import { OrderInList } from './order-in-list.interface';
 import { Order } from './order.interface';
 import { GetOrdersDto } from './get-orders.interface';
 import { UpdateOrderDto } from './update-order.interface';
+import { ResponseData } from '../../common-interfaces/response-data.interface';
+import { ResponseError } from '../../common-interfaces/response-error.interface';
 
 export interface IOrdersService {
-  findOrder(data: GetOrderByIdDto): Observable<Order>;
-  createOrder(data: CreateOrderDto): Observable<Order>;
-  findOrders(data: GetOrdersDto): Observable<OrderInList>;
-  updateOrder(data: UpdateOrderDto): Observable<Order>;
-  deleteItem(data: DeleteItemInOrderDto): Observable<DeleteItemDto>;
-  deleteOrder(data: DeleteOrderDto): Observable<DeletedOrderOutputDto>;
+  findOrder(
+    data: GetOrderByIdDto,
+  ): Observable<ResponseData<Order> | ResponseError>;
+  createOrder(
+    data: CreateOrderDto,
+  ): Observable<ResponseData<Order> | ResponseError>;
+  findOrders(
+    data: GetOrdersDto,
+  ): Observable<ResponseData<OrderInList[]> | ResponseError>;
+  updateOrder(
+    data: UpdateOrderDto,
+  ): Observable<ResponseData<Order> | ResponseError>;
+  deleteItem(
+    data: DeleteItemInOrderDto,
+  ): Observable<ResponseData<DeleteItemDto> | ResponseError>;
+  deleteOrder(
+    data: DeleteOrderDto,
+  ): Observable<ResponseData<DeletedOrderOutputDto> | ResponseError>;
 }

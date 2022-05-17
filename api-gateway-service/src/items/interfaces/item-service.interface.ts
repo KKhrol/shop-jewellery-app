@@ -12,17 +12,33 @@ import { Metal } from '../metals/interfaces/metal.interface';
 import { MetalById } from '../metals/interfaces/metal-by-id.interface';
 import { DeleteMetalDto } from '../metals/interfaces/deleted-metal-output.interface';
 import { CreateMetalDto } from '../metals/interfaces/create-metal.interface';
+import { ResponseData } from '../../common-interfaces/response-data.interface';
+import { ResponseError } from '../../common-interfaces/response-error.interface';
 //import { ItemByMetal } from './item-by-metal.interface';
 
 export interface IItemsService {
-  findOne(data: ItemById): Observable<Item>;
-  findMany(data: ItemsOnPage): Observable<ItemInCollection>;
-  postOne(data: CreateItemDto): Observable<ItemOutputDto>;
-  deleteOne(data: ItemById): Observable<DeleteItemDto>;
-  updateOne(data: UpdateItemDto): Observable<ItemOutputDto>;
-  updateMetal(data: UpdateMetalDto): Observable<Metal>;
-  deleteMetal(data: MetalById): Observable<DeleteMetalDto>;
-  addMetal(data: CreateMetalDto): Observable<Metal>;
-  findMetals(): Observable<Metal>;
+  findOne(data: ItemById): Observable<ResponseData<Item> | ResponseError>;
+  findMany(
+    data: ItemsOnPage,
+  ): Observable<ResponseData<ItemInCollection[]> | ResponseError>;
+  postOne(
+    data: CreateItemDto,
+  ): Observable<ResponseData<ItemOutputDto> | ResponseError>;
+  deleteOne(
+    data: ItemById,
+  ): Observable<ResponseData<DeleteItemDto> | ResponseError>;
+  updateOne(
+    data: UpdateItemDto,
+  ): Observable<ResponseData<ItemOutputDto> | ResponseError>;
+  updateMetal(
+    data: UpdateMetalDto,
+  ): Observable<ResponseData<Metal> | ResponseError>;
+  deleteMetal(
+    data: MetalById,
+  ): Observable<ResponseData<DeleteMetalDto> | ResponseError>;
+  addMetal(
+    data: CreateMetalDto,
+  ): Observable<ResponseData<Metal> | ResponseError>;
+  findMetals(): Observable<ResponseData<Metal[]> | ResponseError>;
   //findOneByMetal(data: ItemByMetal): Observable<Item>;
 }

@@ -20,6 +20,8 @@ import { Cart } from './interfaces/cart.interface';
 import { UpdateCartDto } from './interfaces/update-cart.interface';
 import { CreateOrderDto } from '../orders/interfaces/create-order.interface';
 import { Order } from '../orders/interfaces/order.interface';
+import { ResponseData } from '../common-interfaces/response-data.interface';
+import { ResponseError } from '../common-interfaces/response-error.interface';
 
 @Controller('carts')
 export class CartsController implements OnModuleInit {
@@ -38,7 +40,9 @@ export class CartsController implements OnModuleInit {
   }
 
   @Get()
-  getItemsInCart(@Body() data: CartByUserId): Observable<Cart> {
+  getItemsInCart(
+    @Body() data: CartByUserId,
+  ): Observable<ResponseData<Cart> | ResponseError> {
     return this.cartsService.findCart(data);
   }
 
@@ -46,13 +50,15 @@ export class CartsController implements OnModuleInit {
   updateCart(
     @Param('id') itemId: string,
     @Body() updateCartDto: UpdateCartDto,
-  ): Observable<Cart> {
+  ): Observable<ResponseData<Cart> | ResponseError> {
     updateCartDto.itemId = itemId;
     return this.cartsService.updateCart(updateCartDto);
   }
 
   @Delete()
-  clearCart(@Body() data: CartByUserId): Observable<DeleteItemDto> {
+  clearCart(
+    @Body() data: CartByUserId,
+  ): Observable<ResponseData<DeleteItemDto> | ResponseError> {
     return this.cartsService.clearCart(data);
   }
 
@@ -60,7 +66,7 @@ export class CartsController implements OnModuleInit {
   deleteItem(
     @Param('id') itemId: string,
     @Body() data: CartByUserId,
-  ): Observable<Cart> {
+  ): Observable<ResponseData<Cart> | ResponseError> {
     const cartByItemId: CartByItemId = {
       userId: data.id,
       itemId,
@@ -69,13 +75,15 @@ export class CartsController implements OnModuleInit {
   }
 
   @Post()
-  createOrder(@Body() createOrderDto: CreateOrderDto): Observable<Order> {
+  createOrder(
+    @Body() createOrderDto: CreateOrderDto,
+  ): Observable<ResponseData<Order> | ResponseError> {
     const orderCreated = this.ordersService.createOrder(createOrderDto);
+
     if (orderCreated) {
       const cartClearedMessage = this.cartsService.clearCart({
         id: createOrderDto.userId,
       });
-      //check needed that cart was cleared
     }
     return orderCreated;
   }

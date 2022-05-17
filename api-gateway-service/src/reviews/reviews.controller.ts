@@ -6,10 +6,11 @@ import {
   Inject,
   OnModuleInit,
   Param,
-  Post,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, toArray } from 'rxjs';
+import { Observable } from 'rxjs';
+import { ResponseData } from '../common-interfaces/response-data.interface';
+import { ResponseError } from '../common-interfaces/response-error.interface';
 import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
 import { ReviewByUserId } from './interfaces/review-by-user-id.interface';
 import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
@@ -27,18 +28,23 @@ export class ReviewsController implements OnModuleInit {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Observable<Review> {
+  findOne(
+    @Param('id') id: string,
+  ): Observable<ResponseData<Review> | ResponseError> {
     return this.reviewsService.findOne({ id });
   }
 
   @Get()
-  findMany(@Body() data: ReviewByUserId): Observable<ReviewInUserRatingList[]> {
-    const stream = this.reviewsService.findMany(data);
-    return stream.pipe(toArray());
+  findMany(
+    @Body() data: ReviewByUserId,
+  ): Observable<ResponseData<ReviewInUserRatingList[]> | ResponseError> {
+    return this.reviewsService.findMany(data);
   }
 
   @Delete()
-  deleteManyItems(@Body() data: ReviewByUserId): Observable<DeleteReviewDto> {
+  deleteManyItems(
+    @Body() data: ReviewByUserId,
+  ): Observable<ResponseData<DeleteReviewDto> | ResponseError> {
     return this.reviewsService.deleteMany(data);
   }
 }
