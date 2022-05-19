@@ -10,7 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { IOrdersService } from '../orders/interfaces/order-service.interface';
 import { DeleteItemDto } from '../items/interfaces/deleted-item-output.interface';
 import { CartByItemId } from './interfaces/cart-by-item-id.interface';
@@ -21,7 +21,10 @@ import { UpdateCartDto } from './interfaces/update-cart.interface';
 import { CreateOrderDto } from '../orders/interfaces/create-order.interface';
 import { Order } from '../orders/interfaces/order.interface';
 import { ResponseData } from '../common-interfaces/response-data.interface';
-import { ResponseError } from '../common-interfaces/response-error.interface';
+import {
+  isResponseError,
+  ResponseError,
+} from '../common-interfaces/response-error.interface';
 
 @Controller('carts')
 export class CartsController implements OnModuleInit {
@@ -77,14 +80,24 @@ export class CartsController implements OnModuleInit {
   @Post()
   createOrder(
     @Body() createOrderDto: CreateOrderDto,
-  ): Observable<ResponseData<Order> | ResponseError> {
+  ):
+    | Observable<ResponseData<Order> | ResponseError>
+    | Observable<
+        [
+          ResponseData<Order> | ResponseError,
+          ResponseData<DeleteItemDto> | ResponseError,
+        ]
+      > {
     const orderCreated = this.ordersService.createOrder(createOrderDto);
 
-    if (orderCreated) {
-      const cartClearedMessage = this.cartsService.clearCart({
-        id: createOrderDto.userId,
-      });
-    }
+    orderCreated.subscribe((data: ResponseData<Order> | ResponseError) => {
+      if (isResponseError(data)) {
+        const cartClearedMessage = this.cartsService.clearCart({
+          id: createOrderDto.userId,
+        });
+        return forkJoin([cartClearedMessage, orderCreated]);
+      }
+    });
     return orderCreated;
   }
 }

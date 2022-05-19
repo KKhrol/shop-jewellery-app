@@ -9,11 +9,10 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
     const error = exception.getError().toString();
     const result = {
       status: 'error',
-      message: 'Error occured in collections-microservice!',
+      message: 'Error occured in inventory-microservice!',
       error: error,
     };
     console.log(result);
-    //throwError(() => exception.getError());
     return of(result);
   }
 }

@@ -11,7 +11,7 @@ import { RpcException } from '@nestjs/microservices';
 @Injectable()
 export class ItemsService {
   constructor(private prisma: PrismaService) {}
-  async getItemById(id: string): Promise<Item | null> {
+  async getItemById(id: string): Promise<Item> {
     const item = await this.prisma.item
       .findUnique({
         where: {
@@ -160,7 +160,7 @@ export class ItemsService {
         throw new RpcException(error);
       });
 
-    if (!items) {
+    if (!items || items.length === 0) {
       throw new RpcException('No items in collection');
     }
 
@@ -255,24 +255,23 @@ export class ItemsService {
   }
 
   async deleteItem(id: string): Promise<DeleteItemDto> {
-    const jewelleryId = (
-      await this.prisma.item
-        .findUnique({
-          where: {
-            id,
-          },
-          select: {
-            jewelleryId: true,
-          },
-        })
-        .catch((error) => {
-          throw new RpcException(error);
-        })
-    ).jewelleryId;
+    const jewellery = await this.prisma.item
+      .findUnique({
+        where: {
+          id,
+        },
+        select: {
+          jewelleryId: true,
+        },
+      })
+      .catch((error) => {
+        throw new RpcException(error);
+      });
 
-    if (!jewelleryId) {
+    if (!jewellery) {
       throw new RpcException("The jewellery doesn't exist");
     }
+    const jewelleryId = jewellery.jewelleryId;
 
     //this shows how many jewelleries we have (jewellery is the same, but it can be in different colors)
     const jewelleryCount = (

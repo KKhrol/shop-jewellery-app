@@ -1,3 +1,5 @@
-export interface CartById {
+import { IsUUID } from 'class-validator';
+export class CartById {
+  @IsUUID()
   id: string;
 }

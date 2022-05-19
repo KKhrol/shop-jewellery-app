@@ -1,13 +1,29 @@
-export interface CreateOrderDto {
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsInt,
+  IsPositive,
+  IsUUID,
+} from 'class-validator';
+import { IsArrayOfItems } from '../../decorators/items-array-validation.decorator';
+
+export class CreateOrderDto {
+  @IsUUID()
   userId: string;
+
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsArrayOfItems({ message: "The structure of provided items isn't correct." })
   itemInOrder: ItemInOrder[];
+
+  @IsInt()
+  @IsPositive()
   totalPrice: number;
 }
 
-interface ItemInOrder {
+export class ItemInOrder {
   itemId: string;
   image: string;
-  name: string;
   description: string;
   metalImage: string;
   price: number;

@@ -1,3 +1,6 @@
-export interface DeleteOrderDto {
+import { IsUUID } from 'class-validator';
+
+export class DeleteOrderDto {
+  @IsUUID()
   id: string;
 }

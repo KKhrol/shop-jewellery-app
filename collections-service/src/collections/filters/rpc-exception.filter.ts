@@ -15,7 +15,6 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
       message: 'Error occured in collections-microservice!',
       error: error,
     };
-    console.log(result);
     //throwError(() => exception.getError());
     return of(result);
   }

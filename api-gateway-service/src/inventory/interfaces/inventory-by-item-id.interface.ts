@@ -1,3 +1,6 @@
-export interface InventoryByItemId {
+import { IsUUID } from 'class-validator';
+
+export class InventoryByItemId {
+  @IsUUID()
   id: string;
 }

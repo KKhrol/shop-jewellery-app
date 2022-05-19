@@ -1,10 +1,3 @@
-export interface Cart {
-  userId: string;
-  itemInCart: ItemInCart[];
-  varietyOfItems: number;
-  totalPrice: number;
-}
-
 export interface ItemInCart {
   id: string;
   image: string;
@@ -13,4 +6,11 @@ export interface ItemInCart {
   metalImage: string;
   price: number;
   quantity: number;
+}
+
+export interface Cart {
+  userId: string;
+  itemInCart: ItemInCart[];
+  varietyOfItems: number;
+  totalPrice: number;
 }

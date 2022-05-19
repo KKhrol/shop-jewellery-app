@@ -41,7 +41,9 @@ export class MetalsController implements OnModuleInit {
   }
 
   @Delete(':id')
-  deleteMetal(@Param('id') id: string): Observable<DeleteMetalDto> {
+  deleteMetal(
+    @Param('id') id: string,
+  ): Observable<ResponseData<DeleteMetalDto> | ResponseError> {
     return this.itemsService.deleteMetal({ id });
   }
 

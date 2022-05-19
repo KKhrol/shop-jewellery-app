@@ -59,13 +59,13 @@ export class CollectionsController implements OnModuleInit {
     const itemsPerPage = 3;
     const page = Number(numberOfPage);
 
+    const collection = this.collectionsService.findOne({ id: collectionId });
+
     const items = this.itemsService.findMany({
       page,
       itemsPerPage,
       collectionId,
     });
-    const collection = this.collectionsService.findOne({ id: collectionId });
-
     return forkJoin([collection, items]);
   }
 
