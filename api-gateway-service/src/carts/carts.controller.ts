@@ -3,11 +3,14 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Inject,
   OnModuleInit,
   Param,
   Post,
   Put,
+  UsePipes,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { forkJoin, Observable } from 'rxjs';
@@ -25,6 +28,8 @@ import {
   isResponseError,
   ResponseError,
 } from '../common-interfaces/response-error.interface';
+import { createOrderSchema } from '../schemas/create-order.schema';
+import { ValidationViaSchemaPipe } from 'src/pipes/validation-via-schema.pipe';
 
 @Controller('carts')
 export class CartsController implements OnModuleInit {
@@ -78,6 +83,8 @@ export class CartsController implements OnModuleInit {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationViaSchemaPipe(createOrderSchema))
   createOrder(
     @Body() createOrderDto: CreateOrderDto,
   ):

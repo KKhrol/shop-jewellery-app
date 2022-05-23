@@ -1,19 +1,14 @@
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsInt,
-  IsPositive,
-  IsUUID,
-} from 'class-validator';
-import { IsArrayOfItems } from '../../decorators/items-array-validation.decorator';
+import { createOrderSchema } from '../../schemas/create-order.schema';
 
-export class CreateOrderDto {
+import * as yup from 'yup';
+
+/*export class CreateOrderDto {
   @IsUUID()
   userId: string;
 
   @IsArray()
   @ArrayNotEmpty()
-  @IsArrayOfItems({ message: "The structure of provided items isn't correct." })
+  @IsArrayOfItems()
   itemInOrder: ItemInOrder[];
 
   @IsInt()
@@ -29,3 +24,5 @@ export class ItemInOrder {
   price: number;
   quantity: number;
 }
+*/
+export type CreateOrderDto = yup.InferType<typeof createOrderSchema>;
