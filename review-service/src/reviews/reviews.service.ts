@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto } from './interfaces/create-review.interface';
 import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
 import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
