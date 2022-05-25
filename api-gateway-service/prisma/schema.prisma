@@ -18,7 +18,8 @@ model User {
   resetCode String?
   userRole  Role     @default(USER)
   createdAt  DateTime   @default(now())
-  updatededAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now())
+  deleted    Boolean @default(false)
 
   @@map("users")
 }

@@ -1,4 +1,4 @@
-import { createOrderSchema } from '../../schemas/create-order.schema';
+import { createOrderSchema } from '../schemas/create-order.schema';
 
 import * as yup from 'yup';
 

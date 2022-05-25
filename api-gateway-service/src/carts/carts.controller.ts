@@ -28,8 +28,8 @@ import {
   isResponseError,
   ResponseError,
 } from '../common-interfaces/response-error.interface';
-import { createOrderSchema } from '../schemas/create-order.schema';
-import { ValidationViaSchemaPipe } from 'src/pipes/validation-via-schema.pipe';
+import { createOrderSchema } from '../orders/schemas/create-order.schema';
+import { ValidationViaSchemaPipe } from '../pipes/validation-via-schema.pipe';
 
 @Controller('carts')
 export class CartsController implements OnModuleInit {
