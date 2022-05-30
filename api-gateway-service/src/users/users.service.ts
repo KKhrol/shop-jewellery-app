@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFullInfo } from './interfaces/user-full-info.interface';
 import { User } from './interfaces/user.interface';
 import { UserGetOptions } from './interfaces/user-get-options.interface';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -71,6 +73,23 @@ export class UsersService {
       },
       data: {
         userRole: data.userRole,
+      },
+    });
+  }
+
+  async createUser(data: CreateUserDto): Promise<User> {
+    return this.prisma.user.create({
+      data: {
+        ...data,
+        password: await bcrypt.hash(data.password, 5),
+      },
+      select: {
+        userId: true,
+        username: true,
+        email: true,
+        userRole: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }

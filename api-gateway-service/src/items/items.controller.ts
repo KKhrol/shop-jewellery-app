@@ -8,6 +8,8 @@ import {
   Param,
   Post,
   Put,
+  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { forkJoin, Observable } from 'rxjs';
@@ -30,7 +32,12 @@ import { AddItemInCartDto } from '../common-interfaces/add-item-in-cart.interfac
 import { ItemInCart } from '../common-interfaces/item-in-cart.interface';
 import { ResponseData } from '../common-interfaces/response-data.interface';
 import { ResponseError } from '../common-interfaces/response-error.interface';
+import { HttpExceptionFilter } from '../filters/exception.filter';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from '../decorators/user.decorator';
 
+@UseFilters(new HttpExceptionFilter())
+@UseGuards(JwtAuthGuard)
 @Controller('items')
 export class ItemsController implements OnModuleInit {
   constructor(
@@ -103,9 +110,11 @@ export class ItemsController implements OnModuleInit {
   @Post(':id/carts')
   addItemInCart(
     @Param('id') itemId: string,
+    @User('userId') userId: string,
     @Body() addItemInCart: AddItemInCartDto,
   ): Observable<ResponseData<Cart> | ResponseError> {
     addItemInCart.itemId = itemId;
+    addItemInCart.userId = userId;
     const itemCreated = this.cartsService.addItem(addItemInCart);
     return itemCreated;
   }

@@ -7,6 +7,8 @@ import {
   Param,
   Put,
   UseFilters,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '../filters/exception.filter';
 import { ResponseData } from '../common-interfaces/response-data.interface';
@@ -16,16 +18,18 @@ import { DeletedUserResponse } from './interfaces/user-deleted-output.interface'
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
 import { UserFullInfo } from './interfaces/user-full-info.interface';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @UseFilters(new HttpExceptionFilter())
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async getAllUsers(): Promise<ResponseData<User[]>> {
+  async getAllUsers(@Request() req): Promise<ResponseData<User[]>> {
     const users = await this.usersService.findAllUsers();
-
+    console.log(req.user);
     if (!users) {
       throw new HttpException(
         { message: 'No users found.' },

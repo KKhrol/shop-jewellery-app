@@ -5,16 +5,20 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Request,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '../filters/exception.filter';
 import { ResponseData } from '../common-interfaces/response-data.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/interfaces/user.interface';
 import { AuthService } from './auth.service';
+import { LocalAuthGuard } from './local-auth.guard';
+import { LoginUserDto } from '../users/dto/login-user.dto';
 
 @UseFilters(new HttpExceptionFilter())
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -35,5 +39,11 @@ export class AuthController {
       message: 'User created.',
       data: createdUser,
     };
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  login(@Request() req) {
+    return this.authService.login(req.user);
   }
 }

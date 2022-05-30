@@ -8,19 +8,25 @@ import {
   Param,
   Put,
   Query,
+  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { HttpExceptionFilter } from '../filters/exception.filter';
 import { ResponseData } from '../common-interfaces/response-data.interface';
 import { ResponseError } from '../common-interfaces/response-error.interface';
 import { DeleteItemDto } from '../items/interfaces/deleted-item-output.interface';
 import { DeletedOrderOutputDto } from './interfaces/deleted-order-output.interface';
-import { GetOrderByIdDto } from './interfaces/get-order-by-id.interface';
 import { OrderInList } from './interfaces/order-in-list.interface';
 import { IOrdersService } from './interfaces/order-service.interface';
 import { Order } from './interfaces/order.interface';
 import { UpdateOrderDto } from './interfaces/update-order.interface';
+import { User } from 'src/decorators/user.decorator';
 
+@UseFilters(new HttpExceptionFilter())
+@UseGuards(JwtAuthGuard)
 @Controller('orders')
 export class OrdersController implements OnModuleInit {
   constructor(@Inject('ORDER_PACKAGE') private readonly client: ClientGrpc) {}
@@ -33,12 +39,12 @@ export class OrdersController implements OnModuleInit {
   @Get('deleted')
   getDeletedOrders(
     @Query('page') numberOfPage: number,
-    @Body() orderById: GetOrderByIdDto,
+    @User('userId') userId: string,
   ): Observable<ResponseData<OrderInList[]> | ResponseError> {
     const ordersPerPage = 10;
     const page = Number(numberOfPage);
     const orders = this.ordersService.findOrders({
-      userId: orderById.id,
+      userId,
       page,
       ordersPerPage,
       deleted: true,
@@ -56,12 +62,12 @@ export class OrdersController implements OnModuleInit {
   @Get()
   getOrders(
     @Query('page') numberOfPage: number,
-    @Body() orderById: GetOrderByIdDto,
+    @User('userId') userId: string,
   ): Observable<ResponseData<OrderInList[]> | ResponseError> {
     const ordersPerPage = 10;
     const page = Number(numberOfPage);
     const orders = this.ordersService.findOrders({
-      userId: orderById.id,
+      userId,
       page,
       ordersPerPage,
       deleted: false,

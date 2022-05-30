@@ -12,7 +12,17 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
-    const error = exception.message;
+
+    const exceptionResponse = exception.getResponse();
+    let error: string | object;
+    if (
+      typeof exceptionResponse == 'object' &&
+      exceptionResponse.hasOwnProperty('message')
+    ) {
+      error = exception.message;
+    } else {
+      error = exceptionResponse;
+    }
     response.status(status).json({
       status: 'error',
       message: 'Error occured in api-gateway!',

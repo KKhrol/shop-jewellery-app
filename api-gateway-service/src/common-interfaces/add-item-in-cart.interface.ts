@@ -1,21 +1,20 @@
 import {
+  IsEmpty,
   IsInt,
-  IsOptional,
   IsPositive,
   IsString,
   IsUrl,
-  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
 export class AddItemInCartDto {
-  @IsOptional()
-  @IsUUID()
+  @IsEmpty()
+  //@IsUUID()
   itemId?: string;
 
-  @IsUUID()
-  userId: string;
+  @IsEmpty()
+  userId?: string;
 
   @IsUrl()
   image: string;

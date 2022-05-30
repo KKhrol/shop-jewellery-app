@@ -1,45 +1,30 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
-import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UserGetOptions } from '../users/interfaces/user-get-options.interface';
 import { User } from '../users/interfaces/user.interface';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { UserFullInfo } from 'src/users/interfaces/user-full-info.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
   async createUser(data: CreateUserDto): Promise<User> {
-    return this.prisma.user.create({
-      data: {
-        ...data,
-        password: await bcrypt.hash(data.password, 5),
-      },
-      select: {
-        userId: true,
-        username: true,
-        email: true,
-        userRole: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    return this.usersService.createUser(data);
   }
+
   async validateUser(
     options: Partial<UserGetOptions>,
     pass: string,
-  ): Promise<Partial<User> | null> {
+  ): Promise<Partial<UserFullInfo> | null> {
     const user = await this.usersService.findUser(options, true);
     if (!user || !user.password) {
-      throw new UnauthorizedException({
-        message: 'Invalid login or password.',
-      });
+      return null;
     }
     const isValidated = await this.validatePassword(pass, user.password);
     if (user && isValidated) {
@@ -48,15 +33,17 @@ export class AuthService {
     return null;
   }
 
-  private async generateToken(user: Partial<User>): Promise<string> {
-    const payload = { uid: user.userId };
-    return this.jwtService.sign(payload);
-  }
-
   private async validatePassword(
     incomePassword: string,
     hashedPassword: string,
   ): Promise<boolean> {
     return await bcrypt.compare(incomePassword, hashedPassword);
+  }
+
+  async login(user: Partial<User>) {
+    const payload = { sub: user.userId, username: user.username };
+    return {
+      access_token: this.jwtService.sign(payload, { secret: 'SECRET_WORD' }),
+    };
   }
 }

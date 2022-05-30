@@ -11,6 +11,8 @@ import {
   Post,
   Put,
   Query,
+  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { forkJoin, Observable } from 'rxjs';
@@ -27,7 +29,11 @@ import { ItemOutputDto } from '../items/interfaces/item-output.interface';
 import { ResponseData } from '../common-interfaces/response-data.interface';
 import { ResponseError } from '../common-interfaces/response-error.interface';
 import { CollectionFullInfo } from './interfaces/collection-full-info.interface';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { HttpExceptionFilter } from '../filters/exception.filter';
 
+@UseFilters(new HttpExceptionFilter())
+@UseGuards(JwtAuthGuard)
 @Controller('collections')
 export class CollectionsController implements OnModuleInit {
   constructor(

@@ -10,6 +10,8 @@ import {
   Param,
   Post,
   Put,
+  UseFilters,
+  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -17,7 +19,6 @@ import { forkJoin, Observable } from 'rxjs';
 import { IOrdersService } from '../orders/interfaces/order-service.interface';
 import { DeleteItemDto } from '../items/interfaces/deleted-item-output.interface';
 import { CartByItemId } from './interfaces/cart-by-item-id.interface';
-import { CartByUserId } from './interfaces/cart-by-user-id.interface';
 import { ICartsService } from './interfaces/cart-service.interface';
 import { Cart } from './interfaces/cart.interface';
 import { UpdateCartDto } from './interfaces/update-cart.interface';
@@ -30,7 +31,12 @@ import {
 } from '../common-interfaces/response-error.interface';
 import { createOrderSchema } from '../orders/schemas/create-order.schema';
 import { ValidationViaSchemaPipe } from '../pipes/validation-via-schema.pipe';
+import { HttpExceptionFilter } from '../filters/exception.filter';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from '../decorators/user.decorator';
 
+@UseFilters(new HttpExceptionFilter())
+@UseGuards(JwtAuthGuard)
 @Controller('carts')
 export class CartsController implements OnModuleInit {
   constructor(
@@ -49,34 +55,36 @@ export class CartsController implements OnModuleInit {
 
   @Get()
   getItemsInCart(
-    @Body() data: CartByUserId,
+    @User('userId') id: string,
   ): Observable<ResponseData<Cart> | ResponseError> {
-    return this.cartsService.findCart(data);
+    return this.cartsService.findCart({ id });
   }
 
   @Put(':id')
   updateCart(
     @Param('id') itemId: string,
     @Body() updateCartDto: UpdateCartDto,
+    @User('userId') userId: string,
   ): Observable<ResponseData<Cart> | ResponseError> {
     updateCartDto.itemId = itemId;
+    updateCartDto.userId = userId;
     return this.cartsService.updateCart(updateCartDto);
   }
 
   @Delete()
   clearCart(
-    @Body() data: CartByUserId,
+    @User('userId') id: string,
   ): Observable<ResponseData<DeleteItemDto> | ResponseError> {
-    return this.cartsService.clearCart(data);
+    return this.cartsService.clearCart({ id });
   }
 
   @Delete(':id')
   deleteItem(
     @Param('id') itemId: string,
-    @Body() data: CartByUserId,
+    @User('userId') userId: string,
   ): Observable<ResponseData<Cart> | ResponseError> {
     const cartByItemId: CartByItemId = {
-      userId: data.id,
+      userId,
       itemId,
     };
     return this.cartsService.deleteItemFromCart(cartByItemId);
@@ -87,6 +95,7 @@ export class CartsController implements OnModuleInit {
   @UsePipes(new ValidationViaSchemaPipe(createOrderSchema))
   createOrder(
     @Body() createOrderDto: CreateOrderDto,
+    @User('userId') userId: string,
   ):
     | Observable<ResponseData<Order> | ResponseError>
     | Observable<
@@ -95,6 +104,8 @@ export class CartsController implements OnModuleInit {
           ResponseData<DeleteItemDto> | ResponseError,
         ]
       > {
+    createOrderDto.userId = userId;
+
     const orderCreated = this.ordersService.createOrder(createOrderDto);
 
     orderCreated.subscribe((data: ResponseData<Order> | ResponseError) => {
