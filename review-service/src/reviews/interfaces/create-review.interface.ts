@@ -1,4 +1,4 @@
-export interface CreateReviewDto {
+export class CreateReviewDto {
   itemId?: string;
   userId: string;
   mark: number;

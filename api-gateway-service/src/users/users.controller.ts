@@ -12,8 +12,7 @@ import {
 } from '@nestjs/common';
 import { HttpExceptionFilter } from '../filters/exception.filter';
 import { ResponseData } from '../common-interfaces/response-data.interface';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user-options.dto';
 import { DeletedUserResponse } from './interfaces/user-deleted-output.interface';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
@@ -94,28 +93,6 @@ export class UsersController {
     return {
       status: 'success',
       message: 'User updated.',
-      data: updatedUser,
-    };
-  }
-
-  @Put(':id/role')
-  async updateUserRole(
-    @Param('id') id: string,
-    updateUserRoleDto: UpdateUserRoleDto,
-  ): Promise<ResponseData<User>> {
-    const updatedUser = await this.usersService.updateUserRole(
-      id,
-      updateUserRoleDto,
-    );
-    if (!updatedUser) {
-      throw new HttpException(
-        { message: "The user wasn't updated." },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return {
-      status: 'success',
-      message: "User's role updated.",
       data: updatedUser,
     };
   }

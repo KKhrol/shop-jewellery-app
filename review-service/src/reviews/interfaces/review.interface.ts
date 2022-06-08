@@ -1,4 +1,4 @@
-export interface Review {
+export class Review {
   voters: number;
   mark: number;
 }

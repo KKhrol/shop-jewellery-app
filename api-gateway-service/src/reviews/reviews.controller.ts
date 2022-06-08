@@ -16,11 +16,10 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ResponseData } from '../common-interfaces/response-data.interface';
 import { ResponseError } from '../common-interfaces/response-error.interface';
 import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
-import { ReviewByUserId } from './interfaces/review-by-user-id.interface';
 import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
 import { IReviewsService } from './interfaces/review-service.interface';
 import { Review } from './interfaces/review.interface';
-import { User } from 'src/decorators/user.decorator';
+import { User } from '../decorators/user.decorator';
 
 @UseFilters(new HttpExceptionFilter())
 @UseGuards(JwtAuthGuard)

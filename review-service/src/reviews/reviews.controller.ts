@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { CreateReviewDto } from './interfaces/create-review.interface';
 import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
 import { ResponseData } from './interfaces/response-data.interface';
@@ -15,10 +15,16 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
   @GrpcMethod('ReviewsController', 'FindOne')
   async findOne(data: ReviewByItemId): Promise<ResponseData<Review>> {
+    const rating = await this.reviewsService.getRatingByItemId(data.id);
+
+    if (!rating) {
+      throw new RpcException("The rating of the item wasn't found!");
+    }
+
     return {
       status: 'success',
       message: 'Review found.',
-      data: await this.reviewsService.getRatingByItemId(data.id),
+      data: rating,
     };
   }
 
@@ -26,10 +32,14 @@ export class ReviewsController {
   async deleteOne(
     data: ReviewByItemId,
   ): Promise<ResponseData<DeleteReviewDto>> {
+    const deletedItem = await this.reviewsService.deleteRatingByItemId(data.id);
+    if (!deletedItem) {
+      throw new RpcException("The item wasn't deleted.");
+    }
     return {
       status: 'success',
       message: 'Reviews of item deleted.',
-      data: await this.reviewsService.deleteRatingByItemId(data.id),
+      data: deletedItem,
     };
   }
 
@@ -37,10 +47,16 @@ export class ReviewsController {
   async findMany(
     data: ReviewByUserId,
   ): Promise<ResponseData<ReviewInUserRatingList[]>> {
+    const ratings = await this.reviewsService.getRatingsByUserId(data.userId);
+
+    if (!ratings) {
+      throw new RpcException('No ratings were found!');
+    }
+
     return {
       status: 'success',
       message: 'Reviews found.',
-      data: await this.reviewsService.getRatingsByUserId(data.userId),
+      data: ratings,
     };
   }
 
@@ -48,10 +64,18 @@ export class ReviewsController {
   async deleteMany(
     data: ReviewByUserId,
   ): Promise<ResponseData<DeleteReviewDto>> {
+    const deletedRating = await this.reviewsService.deleteRatingsByUserId(
+      data.userId,
+    );
+
+    if (!deletedRating) {
+      throw new RpcException("Rating of the item wasn't deleted!");
+    }
+
     return {
       status: 'success',
       message: 'Reviews of user deleted.',
-      data: await this.reviewsService.deleteRatingsByUserId(data.userId),
+      data: deletedRating,
     };
   }
 
@@ -59,10 +83,21 @@ export class ReviewsController {
   async addOne(
     createReviewDto: CreateReviewDto,
   ): Promise<ResponseData<Review>> {
+    if (!createReviewDto.itemId) {
+      throw new RpcException('No itemId was provided.');
+    }
+
+    const createdRating = await this.reviewsService.createRating(
+      createReviewDto,
+    );
+
+    if (!createdRating) {
+      throw new RpcException("The rating wasn't created.");
+    }
     return {
       status: 'success',
       message: 'Review added.',
-      data: await this.reviewsService.createRating(createReviewDto),
+      data: createdRating,
     };
   }
 
@@ -70,10 +105,20 @@ export class ReviewsController {
   async updateOne(
     updateReviewDto: UpdateReviewDto,
   ): Promise<ResponseData<Review>> {
+    if (!updateReviewDto.itemId) {
+      throw new RpcException('No itemId was provided.');
+    }
+    const updatedRating = await this.reviewsService.updateRating(
+      updateReviewDto,
+    );
+
+    if (!updatedRating) {
+      throw new RpcException("The rating wasn't updated.");
+    }
     return {
       status: 'success',
       message: 'Review updated.',
-      data: await this.reviewsService.updateRating(updateReviewDto),
+      data: updatedRating,
     };
   }
 }

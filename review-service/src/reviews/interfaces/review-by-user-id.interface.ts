@@ -1,3 +1,3 @@
-export interface ReviewByUserId {
+export class ReviewByUserId {
   userId: string;
 }

@@ -1,4 +1,4 @@
-export interface ReviewInUserRatingList {
+export class ReviewInUserRatingList {
   itemId: string;
   mark: number;
   image: string;

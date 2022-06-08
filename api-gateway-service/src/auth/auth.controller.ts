@@ -15,7 +15,6 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/interfaces/user.interface';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { LoginUserDto } from '../users/dto/login-user.dto';
 
 @UseFilters(new HttpExceptionFilter())
 @Controller('auth')

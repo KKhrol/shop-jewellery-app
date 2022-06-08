@@ -23,7 +23,7 @@ import { OrderInList } from './interfaces/order-in-list.interface';
 import { IOrdersService } from './interfaces/order-service.interface';
 import { Order } from './interfaces/order.interface';
 import { UpdateOrderDto } from './interfaces/update-order.interface';
-import { User } from 'src/decorators/user.decorator';
+import { User } from '../decorators/user.decorator';
 
 @UseFilters(new HttpExceptionFilter())
 @UseGuards(JwtAuthGuard)

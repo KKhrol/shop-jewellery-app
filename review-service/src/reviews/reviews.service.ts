@@ -27,6 +27,11 @@ export class ReviewsService {
       .catch((error) => {
         throw new RpcException(error);
       });
+
+    if (!rating) {
+      return null;
+    }
+
     const res = {
       voters: rating._count.userId,
       mark: rating._avg.mark,
@@ -34,20 +39,7 @@ export class ReviewsService {
     return res;
   }
 
-  async deleteRatingByItemId(itemId: string): Promise<DeleteReviewDto> {
-    const deletedRating = await this.prisma.review
-      .deleteMany({
-        where: {
-          itemId,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-
-    if (!deletedRating) {
-      throw new RpcException("Rating of the item wasn't deleted!");
-    }
+  async deleteRatingByItemId(itemId: string): Promise<DeleteReviewDto | null> {
     const deletedItem = await this.prisma.item
       .delete({
         where: {
@@ -59,12 +51,12 @@ export class ReviewsService {
       });
 
     if (!deletedItem) {
-      throw new RpcException("The item wasn't deleted.");
+      return null;
     }
     return { message: 'Rating of the item was deleted!' };
   }
 
-  async deleteRatingsByUserId(userId: string): Promise<DeleteReviewDto> {
+  async deleteRatingsByUserId(userId: string): Promise<DeleteReviewDto | null> {
     const deletedRating = await this.prisma.review
       .deleteMany({
         where: {
@@ -74,13 +66,17 @@ export class ReviewsService {
       .catch((error) => {
         throw new RpcException(error);
       });
+
     if (!deletedRating) {
-      throw new RpcException("Rating of the item wasn't deleted!");
+      return null;
     }
+
     return { message: 'Ratings of the items were deleted!' };
   }
 
-  async getRatingsByUserId(userId: string): Promise<ReviewInUserRatingList[]> {
+  async getRatingsByUserId(
+    userId: string,
+  ): Promise<ReviewInUserRatingList[] | null> {
     const ratings = await this.prisma.review
       .findMany({
         where: {
@@ -99,9 +95,11 @@ export class ReviewsService {
       .catch((error) => {
         throw new RpcException(error);
       });
+
     if (!ratings) {
-      throw new RpcException('No ratings were found!');
+      return null;
     }
+
     const result = [];
 
     let i = 0;
@@ -119,9 +117,6 @@ export class ReviewsService {
   }
 
   async createRating(data: CreateReviewDto): Promise<Review | null> {
-    if (!data.itemId) {
-      throw new RpcException('No itemId was provided.');
-    }
     const createdRating = await this.prisma.review
       .create({
         data: {
@@ -147,34 +142,13 @@ export class ReviewsService {
       });
 
     if (!createdRating) {
-      throw new RpcException("The rating wasn't created.");
+      return null;
     }
-    const rating = await this.prisma.review
-      .aggregate({
-        where: {
-          itemId: data.itemId,
-        },
-        _count: {
-          userId: true,
-        },
-        _avg: {
-          mark: true,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-    const res = {
-      voters: rating._count.userId,
-      mark: rating._avg.mark,
-    };
-    return res;
+
+    return this.getRatingByItemId(data.itemId);
   }
 
   async updateRating(data: UpdateReviewDto): Promise<Review | null> {
-    if (!data.itemId) {
-      throw new RpcException('No itemId was provided.');
-    }
     const updatedRating = await this.prisma.review
       .update({
         where: {
@@ -192,27 +166,8 @@ export class ReviewsService {
       });
 
     if (!updatedRating) {
-      throw new RpcException("The rating wasn't updated.");
+      return null;
     }
-    const rating = await this.prisma.review
-      .aggregate({
-        where: {
-          itemId: data.itemId,
-        },
-        _count: {
-          userId: true,
-        },
-        _avg: {
-          mark: true,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-    const res = {
-      voters: rating._count.userId,
-      mark: rating._avg.mark,
-    };
-    return res;
+    return this.getRatingByItemId(data.itemId);
   }
 }

@@ -1,3 +1,3 @@
-export interface DeleteReviewDto {
+export class DeleteReviewDto {
   message: string;
 }
