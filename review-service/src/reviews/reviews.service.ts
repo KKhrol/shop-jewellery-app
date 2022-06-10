@@ -12,21 +12,17 @@ export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
   async getRatingByItemId(itemId: string): Promise<Review | null> {
-    const rating = await this.prisma.review
-      .aggregate({
-        where: {
-          itemId,
-        },
-        _count: {
-          userId: true,
-        },
-        _avg: {
-          mark: true,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
+    const rating = await this.prisma.review.aggregate({
+      where: {
+        itemId,
+      },
+      _count: {
+        userId: true,
+      },
+      _avg: {
+        mark: true,
+      },
+    });
 
     if (!rating) {
       return null;
@@ -39,16 +35,12 @@ export class ReviewsService {
     return res;
   }
 
-  async deleteRatingByItemId(itemId: string): Promise<DeleteReviewDto | null> {
-    const deletedItem = await this.prisma.item
-      .delete({
-        where: {
-          id: itemId,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
+  async deleteRatingByItemId(id: string): Promise<DeleteReviewDto | null> {
+    const deletedItem = await this.prisma.item.delete({
+      where: {
+        id,
+      },
+    });
 
     if (!deletedItem) {
       return null;
@@ -57,15 +49,11 @@ export class ReviewsService {
   }
 
   async deleteRatingsByUserId(userId: string): Promise<DeleteReviewDto | null> {
-    const deletedRating = await this.prisma.review
-      .deleteMany({
-        where: {
-          userId,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
+    const deletedRating = await this.prisma.review.deleteMany({
+      where: {
+        userId,
+      },
+    });
 
     if (!deletedRating) {
       return null;
@@ -77,24 +65,20 @@ export class ReviewsService {
   async getRatingsByUserId(
     userId: string,
   ): Promise<ReviewInUserRatingList[] | null> {
-    const ratings = await this.prisma.review
-      .findMany({
-        where: {
-          userId,
-        },
-        include: {
-          item: {
-            select: {
-              image: true,
-              name: true,
-              metalImage: true,
-            },
+    const ratings = await this.prisma.review.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        item: {
+          select: {
+            image: true,
+            name: true,
+            metalImage: true,
           },
         },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
+      },
+    });
 
     if (!ratings) {
       return null;
@@ -149,21 +133,17 @@ export class ReviewsService {
   }
 
   async updateRating(data: UpdateReviewDto): Promise<Review | null> {
-    const updatedRating = await this.prisma.review
-      .update({
-        where: {
-          userId_itemId: {
-            itemId: data.itemId,
-            userId: data.userId,
-          },
+    const updatedRating = await this.prisma.review.update({
+      where: {
+        userId_itemId: {
+          itemId: data.itemId,
+          userId: data.userId,
         },
-        data: {
-          mark: data.mark,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
+      },
+      data: {
+        mark: data.mark,
+      },
+    });
 
     if (!updatedRating) {
       return null;
