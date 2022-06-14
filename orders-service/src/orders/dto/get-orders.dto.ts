@@ -1,4 +1,4 @@
-export interface GetOrdersDto {
+export class GetOrdersDto {
   userId: string;
   page: number;
   ordersPerPage: number;

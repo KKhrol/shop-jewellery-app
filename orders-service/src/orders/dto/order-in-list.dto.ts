@@ -1,4 +1,4 @@
-export interface OrderInList {
+export class OrderInList {
   orderId: string;
   varietyOfItems: number;
   totalPrice: number;

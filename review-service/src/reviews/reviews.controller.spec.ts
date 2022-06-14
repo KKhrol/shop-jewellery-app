@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { RpcException } from '@nestjs/microservices';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateReviewDto } from './interfaces/create-review.interface';
-import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
-import { ReviewByItemId } from './interfaces/review-by-item-id.interface';
-import { ReviewByUserId } from './interfaces/review-by-user-id.interface';
-import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
-import { Review } from './interfaces/review.interface';
-import { UpdateReviewDto } from './interfaces/update-review.interface';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { DeleteReviewDto } from './dto/deleted-review-output.dto';
+import { ResponseData } from './dto/response-data.dto';
+import { ReviewByItemId } from './dto/review-by-item-id.dto';
+import { ReviewByUserId } from './dto/review-by-user-id.dto';
+import { ReviewInUserRatingList } from './dto/review-in-user-rating-list.dto';
+import { Review } from './dto/review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewsController } from './reviews.controller';
 import { ReviewsService } from './reviews.service';
 
@@ -58,12 +59,18 @@ describe('ReviewsController Unit Tests', () => {
     dto.id = '3b7kj89';
     expect(controller.findOne(dto)).not.toEqual(null);
     expect(controller.findOne(dto)).resolves.toBeInstanceOf(Object);
+    expect(controller.findOne(dto)).resolves.toMatchObject(
+      new ResponseData<Review>(),
+    );
   });
 
   it('checks work of deleteOne method of the controller', () => {
     const dto = new ReviewByItemId();
     dto.id = '3b7kj89';
     expect(controller.deleteOne(dto)).not.toEqual(null);
+    expect(controller.deleteOne(dto)).resolves.toMatchObject(
+      new ResponseData<DeleteReviewDto>(),
+    );
   });
 
   it('checks work of findMany method of the controller', () => {
@@ -71,12 +78,18 @@ describe('ReviewsController Unit Tests', () => {
     dto.userId = '3b7kj89';
     expect(controller.findMany(dto)).not.toEqual(null);
     expect(controller.findMany(dto)).resolves.toBeInstanceOf(Object);
+    expect(controller.findMany(dto)).resolves.toMatchObject(
+      new ResponseData<ReviewInUserRatingList[]>(),
+    );
   });
 
   it('checks work of deleteMany method of the controller', () => {
     const dto = new ReviewByUserId();
     dto.userId = '3b7kj89';
     expect(controller.deleteMany(dto)).not.toEqual(null);
+    expect(controller.deleteMany(dto)).resolves.toMatchObject(
+      new ResponseData<DeleteReviewDto>(),
+    );
   });
 
   it('checks work of addOne method of the controller', () => {
@@ -85,6 +98,9 @@ describe('ReviewsController Unit Tests', () => {
     dto.userId = '3b7kj89';
     expect(controller.addOne(dto)).not.toEqual(null);
     expect(controller.addOne(dto)).resolves.toBeInstanceOf(Object);
+    expect(controller.addOne(dto)).resolves.toMatchObject(
+      new ResponseData<Review>(),
+    );
   });
 
   it('checks work of updateOne method of the controller', () => {
@@ -93,6 +109,9 @@ describe('ReviewsController Unit Tests', () => {
     dto.userId = '3b7kj89';
     expect(controller.updateOne(dto)).not.toEqual(null);
     expect(controller.updateOne(dto)).resolves.toBeInstanceOf(Object);
+    expect(controller.updateOne(dto)).resolves.toMatchObject(
+      new ResponseData<Review>(),
+    );
   });
 
   it('should throw RpcException from findOne method of the controller when itemId is not provided', async () => {

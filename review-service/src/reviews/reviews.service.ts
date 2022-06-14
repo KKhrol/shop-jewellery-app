@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateReviewDto } from './interfaces/create-review.interface';
-import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
-import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
-import { Review } from './interfaces/review.interface';
-import { UpdateReviewDto } from './interfaces/update-review.interface';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { DeleteReviewDto } from './dto/deleted-review-output.dto';
+import { ReviewInUserRatingList } from './dto/review-in-user-rating-list.dto';
+import { Review } from './dto/review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {

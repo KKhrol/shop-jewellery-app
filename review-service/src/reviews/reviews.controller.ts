@@ -1,13 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
-import { CreateReviewDto } from './interfaces/create-review.interface';
-import { DeleteReviewDto } from './interfaces/deleted-review-output.interface';
-import { ResponseData } from './interfaces/response-data.interface';
-import { ReviewByItemId } from './interfaces/review-by-item-id.interface';
-import { ReviewByUserId } from './interfaces/review-by-user-id.interface';
-import { ReviewInUserRatingList } from './interfaces/review-in-user-rating-list.interface';
-import { Review } from './interfaces/review.interface';
-import { UpdateReviewDto } from './interfaces/update-review.interface';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { DeleteReviewDto } from './dto/deleted-review-output.dto';
+import { ResponseData } from './dto/response-data.dto';
+import { ReviewByItemId } from './dto/review-by-item-id.dto';
+import { ReviewByUserId } from './dto/review-by-user-id.dto';
+import { ReviewInUserRatingList } from './dto/review-in-user-rating-list.dto';
+import { Review } from './dto/review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewsService } from './reviews.service';
 
 @Controller()

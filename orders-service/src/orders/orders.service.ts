@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateOrderDto } from './interfaces/create-order.interface';
-import { DeleteItemInOrderDto } from './interfaces/delete-item-in-order.interface';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { DeleteItemInOrderDto } from './dto/delete-item-in-order.dto';
 import { DeleteItemDto } from './interfaces/deleted-item-output.interface';
-import { DeletedOrderOutputDto } from './interfaces/deleted-order-output.interface';
-import { GetOrdersDto } from './interfaces/get-orders.interface';
-import { OrderInList } from './interfaces/order-in-list.interface';
-import { Order } from './interfaces/order.interface';
-import { UpdateOrderDto } from './interfaces/update-order.interface';
+import { DeletedOrderOutputDto } from './dto/deleted-order-output.dto';
+import { GetOrdersDto } from './dto/get-orders.dto';
+import { OrderInList } from './dto/order-in-list.dto';
+import { Order } from './dto/order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdatedOrderOuput } from './dto/updated-order-output.dto';
 
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
-  async getOrderById(id: string): Promise<Order> {
-    console.log(id);
+  async getOrderById(id: string): Promise<Order | null> {
     const order = await this.prisma.order
       .findUnique({
         where: {
@@ -29,7 +29,7 @@ export class OrdersService {
       });
 
     if (!order) {
-      throw new RpcException("The order wasn't found");
+      return null;
     }
 
     const varietyOfItems = await this.prisma.item
@@ -54,8 +54,7 @@ export class OrdersService {
     return result;
   }
 
-  async createOrder(data: CreateOrderDto): Promise<Order> {
-    console.log(data.itemInOrder);
+  async createOrder(data: CreateOrderDto): Promise<Order | null> {
     const orderCreated = await this.prisma.order
       .create({
         data: {
@@ -72,12 +71,12 @@ export class OrdersService {
         throw new RpcException(error);
       });
     if (!orderCreated) {
-      throw new RpcException("The order wasn't created");
+      return null;
     }
     return this.getOrderById(orderCreated.id);
   }
 
-  async getOrders(data: GetOrdersDto): Promise<OrderInList[]> {
+  async getOrders(data: GetOrdersDto): Promise<OrderInList[] | null> {
     const orders = await this.prisma.order
       .findMany({
         where: {
@@ -102,7 +101,7 @@ export class OrdersService {
         throw new RpcException(error);
       });
     if (!orders) {
-      throw new RpcException('No orders were found.');
+      return null;
     }
     const result = [];
     let i = 0;
@@ -118,16 +117,33 @@ export class OrdersService {
     return result;
   }
 
-  async deleteItem(data: DeleteItemInOrderDto): Promise<DeleteItemDto> {
-    const countItems = await this.prisma.item
-      .count({
+  async getOrderTotalPrice(orderId: string): Promise<number | null> {
+    const items = await this.prisma.item
+      .findMany({
         where: {
-          orderId: data.orderId,
+          orderId,
+        },
+        select: {
+          price: true,
+          quantity: true,
         },
       })
       .catch((error) => {
         throw new RpcException(error);
       });
+
+    if (!items) {
+      return null;
+    }
+
+    let totalPrice = 0;
+    items.forEach(function (item) {
+      totalPrice += item.price * item.quantity;
+    });
+    return totalPrice;
+  }
+
+  async deleteItem(data: DeleteItemInOrderDto): Promise<DeleteItemDto> {
     const itemDeleted = await this.prisma.item
       .delete({
         where: {
@@ -141,66 +157,13 @@ export class OrdersService {
         throw new RpcException(error);
       });
     if (!itemDeleted) {
-      throw new RpcException("The item in order wasn't deleted.");
-    }
-    if (countItems === 1) {
-      const orderDeleted = await this.prisma.order
-        .delete({
-          where: {
-            id: data.orderId,
-          },
-        })
-        .catch((error) => {
-          throw new RpcException(error);
-        });
-      if (!orderDeleted) {
-        throw new RpcException("The empty order wasn't deleted.");
-      }
-      return { message: 'Order and item were deleted!' };
-    }
-
-    const items = await this.prisma.item
-      .findMany({
-        where: {
-          orderId: data.orderId,
-        },
-        select: {
-          price: true,
-          quantity: true,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-
-    let totalPrice = 0;
-    items.forEach(function (item) {
-      totalPrice += item.price * item.quantity;
-    });
-
-    const updatedTotalPrice = await this.prisma.order
-      .update({
-        where: {
-          id: data.orderId,
-        },
-        data: {
-          totalPrice: totalPrice,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-
-    if (!updatedTotalPrice) {
-      throw new RpcException(
-        "The item was deleted but total price wasn't updated",
-      );
+      return null;
     }
 
     return { message: 'Item was deleted' };
   }
 
-  async deleteOrder(id: string): Promise<DeletedOrderOutputDto> {
+  async deleteOrder(id: string): Promise<DeletedOrderOutputDto | null> {
     const orderDeleted = await this.prisma.order
       .update({
         where: {
@@ -214,36 +177,14 @@ export class OrdersService {
         throw new RpcException(error);
       });
     if (!orderDeleted) {
-      throw new RpcException("The order wasn't deleted");
+      return null;
     }
     return { message: 'Order was deleted!' };
   }
 
-  async updateOrder(data: UpdateOrderDto): Promise<Order | null> {
-    if (!data.orderId) {
-      throw new RpcException("The orderId wasn't provided");
-    }
-    if (data.discount < 0 || data.discount > 100) {
-      throw new RpcException('Invalid amount of discount.');
-    }
-
-    const order = await this.prisma.order
-      .findUnique({
-        where: {
-          id: data.orderId,
-        },
-        select: {
-          totalPrice: true,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-    if (!order) {
-      throw new RpcException("The order doesn't exist");
-    }
+  async updateOrder(data: UpdateOrderDto): Promise<UpdatedOrderOuput | null> {
     const newTotalPrice = Math.round(
-      ((100 - data.discount) * order.totalPrice) / 100,
+      ((100 - data.discount) * data.oldTotalPrice) / 100,
     );
     const orderUpdated = await this.prisma.order
       .update({
@@ -253,13 +194,16 @@ export class OrdersService {
         data: {
           totalPrice: newTotalPrice,
         },
+        select: {
+          id: true,
+        },
       })
       .catch((error) => {
         throw new RpcException(error);
       });
     if (!orderUpdated) {
-      throw new RpcException("The order wasn't updated.");
+      return null;
     }
-    return this.getOrderById(data.orderId);
+    return orderUpdated;
   }
 }

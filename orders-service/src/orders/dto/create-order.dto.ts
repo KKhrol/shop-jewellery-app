@@ -1,10 +1,10 @@
-export interface CreateOrderDto {
+export class CreateOrderDto {
   userId: string;
   itemInOrder: ItemInOrder[];
   totalPrice: number;
 }
 
-interface ItemInOrder {
+export class ItemInOrder {
   itemId: string;
   image: string;
   name: string;

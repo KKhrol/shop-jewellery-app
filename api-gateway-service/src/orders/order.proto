@@ -41,6 +41,7 @@ message GetOrdersDto {
 message UpdateOrderDto {
     string orderId = 1;
     int32 discount = 2;
+    int32 oldTotalPrice = 3;
 }
 
 message DeleteItemInOrderDto {

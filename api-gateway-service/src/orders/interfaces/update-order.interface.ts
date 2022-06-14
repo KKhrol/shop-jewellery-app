@@ -17,4 +17,9 @@ export class UpdateOrderDto {
   @Min(1)
   @Max(99)
   discount: number;
+
+  @IsDefined()
+  @IsInt()
+  @Min(1)
+  oldTotalPrice: number;
 }

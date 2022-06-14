@@ -32,7 +32,7 @@ model Item {
   metalImage  String
   price       Int
 
-  order Order @relation(fields: [orderId], references: [id])
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@id([orderId, itemId])
   @@map("items")

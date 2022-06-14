@@ -15,7 +15,7 @@ model Review {
   itemId  String
   mark     Float
 
-  item  Item  @relation(fields: [itemId], references: [id])
+  item  Item  @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@id([userId, itemId])
   @@map("reviews")
