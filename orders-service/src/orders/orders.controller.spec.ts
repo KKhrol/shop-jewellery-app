@@ -148,7 +148,7 @@ describe('OrdersController Unit Tests', () => {
       );
     });
 
-    it('should throw RpcException when userId is not provided, cause the query could not be performed.', async () => {
+    it('should throw RpcException when userId is not provided, when the query could not be performed.', async () => {
       const dto = new CreateOrderDto();
       dto.itemInOrder = [new ItemInOrder()];
       dto.totalPrice = 111;
@@ -157,7 +157,7 @@ describe('OrdersController Unit Tests', () => {
       await expect(controller.createOrder(dto)).rejects.toThrow('error');
     });
 
-    it('should throw RpcException when itemInOrder is not provided, cause the query could not be performed.', async () => {
+    it('should throw RpcException when itemInOrder is not provided, when the query could not be performed.', async () => {
       const dto = new CreateOrderDto();
       dto.totalPrice = 111;
       dto.userId = 'userId';
@@ -166,7 +166,7 @@ describe('OrdersController Unit Tests', () => {
       await expect(controller.createOrder(dto)).rejects.toThrow('error');
     });
 
-    it('should throw RpcException when totalPrice is not provided, cause the query could not be performed.', async () => {
+    it('should throw RpcException when totalPrice is not provided, when the query could not be performed.', async () => {
       const dto = new CreateOrderDto();
       dto.itemInOrder = [new ItemInOrder()];
       dto.userId = 'userId';

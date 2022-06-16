@@ -110,7 +110,7 @@ export class OrdersService {
         orderId: data.id,
         varietyOfItems: data._count.items,
         totalPrice: data.totalPrice,
-        updatedAt: data.updatedAt,
+        updatedAt: data.updatedAt.toDateString(),
       };
       i++;
     });
