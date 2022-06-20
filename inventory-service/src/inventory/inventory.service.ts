@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateInventoryDto } from './interfaces/create-inventory.interface';
-import { DeleteInventoryDto } from './interfaces/deleted-inventory-output';
-import { Inventory } from './interfaces/inventory.interface';
-import { UpdateInventoryDto } from './interfaces/update-inventory.interface';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateInventoryDto } from './dto/create-inventory.dto';
+import { DeleteInventoryDto } from './dto/deleted-inventory-output.dto';
+import { Inventory } from './dto/inventory.dto';
+import { UpdateInventoryDto } from './dto/update-inventory.dto';
 
 @Injectable()
 export class InventoryService {
   constructor(private prisma: PrismaService) {}
-  async getItemQuantity(id: string): Promise<Inventory> {
+  async getInventory(id: string): Promise<Inventory | null> {
     const inventory = await this.prisma.stock
       .findUnique({
         where: {
@@ -23,17 +23,12 @@ export class InventoryService {
         throw new RpcException(error);
       });
     if (!inventory) {
-      return {
-        quantity: 0,
-      };
+      return null;
     }
-    const result = {
-      quantity: inventory.quantity,
-    };
-    return result;
+    return inventory;
   }
 
-  async addItemInventory(data: CreateInventoryDto): Promise<Inventory> {
+  async addInventory(data: CreateInventoryDto): Promise<Inventory | null> {
     const inventory = await this.prisma.stock
       .create({
         data: {
@@ -45,27 +40,13 @@ export class InventoryService {
         throw new RpcException(error);
       });
     if (!inventory) {
-      throw new RpcException("The item inventory wasn't added");
+      return null;
     }
-
     return inventory;
   }
 
-  async deleteItemInventory(id: string): Promise<DeleteInventoryDto> {
-    // check if the inventory for item exists
-    const inventory = await this.prisma.stock
-      .findUnique({
-        where: {
-          itemId: id,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-    if (!inventory) {
-      throw new RpcException("The inventory for that item didn't exist");
-    }
-    const deletedInventory = await this.prisma.stock
+  async deleteInventory(id: string): Promise<DeleteInventoryDto | null> {
+    const inventoryDeleted = await this.prisma.stock
       .delete({
         where: {
           itemId: id,
@@ -74,16 +55,13 @@ export class InventoryService {
       .catch((error) => {
         throw new RpcException(error);
       });
-    if (!deletedInventory) {
-      throw new RpcException("The item's inventory wasn't deleted.");
+    if (!inventoryDeleted) {
+      return null;
     }
     return { message: "The item's inventory was deleted!" };
   }
 
-  async updateItemInventory(data: UpdateInventoryDto): Promise<Inventory> {
-    if (!data.quantity) {
-      throw new RpcException('No quantity was privided.');
-    }
+  async updateInventory(data: UpdateInventoryDto): Promise<Inventory | null> {
     const upsertedInventory = await this.prisma.stock
       .upsert({
         where: {
@@ -102,20 +80,8 @@ export class InventoryService {
       });
 
     if (!upsertedInventory) {
-      throw new RpcException("The item's inventory wasn't upserted.");
+      return null;
     }
-    const stock = await this.prisma.stock
-      .findUnique({
-        where: {
-          itemId: data.id,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-    if (!stock) {
-      throw new RpcException("The item's inventory wasn't found.");
-    }
-    return stock;
+    return upsertedInventory;
   }
 }
