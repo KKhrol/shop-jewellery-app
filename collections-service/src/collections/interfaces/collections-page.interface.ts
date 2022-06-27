@@ -1,4 +1,4 @@
-export interface CollectionsOnPage {
+export class CollectionsOnPage {
   page: number;
   itemsPerPage: number;
 }

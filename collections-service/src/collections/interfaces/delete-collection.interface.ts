@@ -1,3 +1,3 @@
-export interface DeleteCollectionDto {
+export class DeleteCollectionDto {
   message: string;
 }

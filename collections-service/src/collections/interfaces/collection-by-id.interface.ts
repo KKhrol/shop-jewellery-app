@@ -1,3 +1,3 @@
-export interface CollectionById {
+export class CollectionById {
   id: string;
 }

@@ -1,4 +1,4 @@
-export interface UpdateCollectionDto {
+export class UpdateCollectionDto {
   id?: string;
   name?: string;
   description?: string;

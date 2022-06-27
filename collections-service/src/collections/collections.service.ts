@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Collection } from '@prisma/client';
 import { CreateCollectionDto } from './interfaces/create-collection.interface';
-import { from, Observable } from 'rxjs';
 import { UpdateCollectionDto } from './interfaces/update-collection.interface';
 import { DeleteCollectionDto } from './interfaces/delete-collection.interface';
 import { RpcException } from '@nestjs/microservices';
@@ -12,7 +11,7 @@ import { CollectionFullInfo } from './interfaces/collection-full-info.interface'
 export class CollectionsService {
   constructor(private prisma: PrismaService) {}
 
-  async getCollectionById(id: string): Promise<CollectionFullInfo | null> {
+  async getCollection(id: string): Promise<CollectionFullInfo | null> {
     const collection = await this.prisma.collection
       .findUnique({
         where: {
@@ -22,9 +21,11 @@ export class CollectionsService {
       .catch((error) => {
         throw new RpcException(error);
       });
+
     if (!collection) {
-      throw new RpcException("Collection doesn't exist!");
+      return null;
     }
+
     return {
       id: collection.id,
       name: collection.name,
@@ -38,7 +39,7 @@ export class CollectionsService {
   async getCollections(
     page: number,
     itemsPerPage: number,
-  ): Promise<Collection[]> {
+  ): Promise<Collection[] | null> {
     const collections = await this.prisma.collection
       .findMany({
         skip: page * itemsPerPage,
@@ -48,14 +49,12 @@ export class CollectionsService {
         throw new RpcException(error);
       });
     if (!collections) {
-      throw new RpcException('No collections!');
+      return null;
     }
-    console.log(collections);
-    /*const result = from(collections);*/
     return collections;
   }
 
-  async addCollection(data: CreateCollectionDto): Promise<Collection> {
+  async addCollection(data: CreateCollectionDto): Promise<Collection | null> {
     const collection = await this.prisma.collection
       .create({
         data: data,
@@ -64,12 +63,12 @@ export class CollectionsService {
         throw new RpcException(error);
       });
     if (!collection) {
-      throw new RpcException("The collection wasn't inserted!");
+      return null;
     }
     return collection;
   }
 
-  async deleteCollection(id: string): Promise<DeleteCollectionDto> {
+  async deleteCollection(id: string): Promise<DeleteCollectionDto | null> {
     const deletedCollection = await this.prisma.collection
       .delete({
         where: {
@@ -80,28 +79,26 @@ export class CollectionsService {
         throw new RpcException(error);
       });
     if (!deletedCollection) {
-      throw new RpcException("The collection wasn't deleted!");
+      return null;
     }
     return { message: 'Collection was deleted!' };
   }
 
-  async updateCollection(data: UpdateCollectionDto): Promise<Collection> {
+  async updateCollection(
+    data: UpdateCollectionDto,
+  ): Promise<Collection | null> {
     const collection = await this.prisma.collection
       .update({
         where: {
           id: data.id,
         },
-        data: {
-          name: data.name,
-          description: data.description,
-          image: data.image,
-        },
+        data,
       })
       .catch((error) => {
         throw new RpcException(error);
       });
     if (!collection) {
-      throw new RpcException("The collection wasn't updated!");
+      return null;
     }
     return collection;
   }

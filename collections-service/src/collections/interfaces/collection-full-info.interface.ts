@@ -1,4 +1,4 @@
-export interface CollectionFullInfo {
+export class CollectionFullInfo {
   id: string;
   name: string;
   description: string;

@@ -1,6 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { CollectionsService } from './collections.service';
 import { CollectionById } from './interfaces/collection-by-id.interface';
 import { CollectionFullInfo } from './interfaces/collection-full-info.interface';
@@ -19,22 +18,30 @@ export class CollectionsController {
   async findOne(
     data: CollectionById,
   ): Promise<ResponseData<CollectionFullInfo>> {
+    const collection = await this.collectionsService.getCollection(data.id);
+    if (!collection) {
+      throw new RpcException("The collection wasn't found!");
+    }
     return {
       status: 'success',
       message: 'Collection found.',
-      data: await this.collectionsService.getCollectionById(data.id),
+      data: collection,
     };
   }
 
   @GrpcMethod('CollectionsController', 'FindMany')
   async findMany(data: CollectionsOnPage): Promise<ResponseData<Collection[]>> {
+    const collections = await this.collectionsService.getCollections(
+      data.page,
+      data.itemsPerPage,
+    );
+    if (!collections) {
+      throw new RpcException('No collections found!');
+    }
     return {
       status: 'success',
       message: 'Collections found.',
-      data: await this.collectionsService.getCollections(
-        data.page,
-        data.itemsPerPage,
-      ),
+      data: collections,
     };
   }
 
@@ -42,10 +49,18 @@ export class CollectionsController {
   async postCollection(
     createCollectionDto: CreateCollectionDto,
   ): Promise<ResponseData<Collection>> {
+    const collection = await this.collectionsService.addCollection(
+      createCollectionDto,
+    );
+
+    if (!collection) {
+      throw new RpcException("The collection wasn't inserted!");
+    }
+
     return {
       status: 'success',
       message: 'Collection created.',
-      data: await this.collectionsService.addCollection(createCollectionDto),
+      data: collection,
     };
   }
 
@@ -53,10 +68,18 @@ export class CollectionsController {
   async updateOne(
     updateCollectionDto: UpdateCollectionDto,
   ): Promise<ResponseData<Collection>> {
+    const updatedCollection = await this.collectionsService.updateCollection(
+      updateCollectionDto,
+    );
+
+    if (!updatedCollection) {
+      throw new RpcException("The collection wasn't updated!");
+    }
+
     return {
       status: 'success',
       message: 'Collection updated.',
-      data: await this.collectionsService.updateCollection(updateCollectionDto),
+      data: updatedCollection,
     };
   }
 
@@ -64,10 +87,18 @@ export class CollectionsController {
   async deleteOne(
     collectionById: CollectionById,
   ): Promise<ResponseData<DeleteCollectionDto>> {
+    const deletedCollection = await this.collectionsService.deleteCollection(
+      collectionById.id,
+    );
+
+    if (!deletedCollection) {
+      throw new RpcException("The collection wasn't deleted!");
+    }
+
     return {
       status: 'success',
       message: 'Collection deleted.',
-      data: await this.collectionsService.deleteCollection(collectionById.id),
+      data: deletedCollection,
     };
   }
 }
