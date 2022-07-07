@@ -1,4 +1,4 @@
-export interface ItemInCart {
+export class ItemInCart {
   id: string;
   image: string;
   itemName: string;

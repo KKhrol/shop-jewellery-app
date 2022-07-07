@@ -1,4 +1,4 @@
-export interface AddItemInCartDto {
+export class AddItemInCartDto {
   itemId?: string;
   userId: string;
   image: string;

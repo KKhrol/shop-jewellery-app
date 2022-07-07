@@ -25,7 +25,7 @@ model Item {
 model Cart {
   userId String @default(uuid())
 
-  item     Item   @relation(fields: [itemId], references: [id])
+  item     Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId   String
   quantity Int
 

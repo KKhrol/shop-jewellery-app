@@ -13,11 +13,11 @@ import { RpcException } from '@nestjs/microservices';
 @Injectable()
 export class CartsService {
   constructor(private prisma: PrismaService) {}
-  async getCartByUserId(id: string): Promise<Cart> {
+  async getCartByUserId(userId: string): Promise<Cart | null> {
     const cart = await this.prisma.cart
       .findMany({
         where: {
-          userId: id,
+          userId,
         },
         include: {
           item: true,
@@ -28,12 +28,12 @@ export class CartsService {
       });
 
     if (!cart) {
-      throw new RpcException('No carts were found.');
+      return null;
     }
     const countItems = await this.prisma.cart
       .count({
         where: {
-          userId: id,
+          userId,
         },
       })
       .catch((error) => {
@@ -51,7 +51,7 @@ export class CartsService {
       i++;
     });
     const result = {
-      userId: id,
+      userId,
       itemInCart: items,
       varietyOfItems: countItems,
       totalPrice: totalPrice,
@@ -59,13 +59,7 @@ export class CartsService {
     return result;
   }
 
-  async updateCart(data: UpdateCartDto): Promise<Cart> {
-    if (data.quantity === 0) {
-      throw new RpcException('Quantity of the item should be > 0');
-    }
-    if (!data.itemId) {
-      throw new RpcException("The itemId wasn't provided.");
-    }
+  async updateCart(data: UpdateCartDto): Promise<string | null> {
     const updatedCart = await this.prisma.cart
       .update({
         where: {
@@ -82,12 +76,12 @@ export class CartsService {
         throw new RpcException(error);
       });
     if (!updatedCart) {
-      throw new RpcException("The cart wasn't updated.");
+      return null;
     }
-    return this.getCartByUserId(data.userId);
+    return data.userId;
   }
 
-  async clearCart(userId: string): Promise<DeleteItemDto> {
+  async clearCart(userId: string): Promise<DeleteItemDto | null> {
     const deletedItems = await this.prisma.cart
       .deleteMany({
         where: {
@@ -97,13 +91,15 @@ export class CartsService {
       .catch((error) => {
         throw new RpcException(error);
       });
+
     if (!deletedItems) {
-      throw new RpcException("The cart wasn't cleared.");
+      return null;
     }
+
     return { message: 'Items in cart were deleted!' };
   }
 
-  async removeItemFromCart(data: CartByItemId): Promise<Cart | null> {
+  async removeItemFromCart(data: CartByItemId): Promise<string | null> {
     const deletedItem = await this.prisma.cart
       .delete({
         where: {
@@ -117,52 +113,12 @@ export class CartsService {
         throw new RpcException(error);
       });
     if (!deletedItem) {
-      throw new RpcException("The item wasn't removed from cart.");
+      return null;
     }
-    return this.getCartByUserId(data.userId);
+    return deletedItem.userId;
   }
 
-  async deleteItem(id: string): Promise<DeleteItemDto> {
-    const item = await this.prisma.item
-      .findUnique({
-        where: {
-          id,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-
-    if (!item) {
-      throw new RpcException(
-        "The item wasn't deleted, because it didn't exist.",
-      );
-    }
-    const itemInCarts = await this.prisma.cart
-      .findMany({
-        where: {
-          itemId: id,
-        },
-      })
-      .catch((error) => {
-        throw new RpcException(error);
-      });
-
-    if (itemInCarts) {
-      const deletedItems = await this.prisma.cart
-        .deleteMany({
-          where: {
-            itemId: id,
-          },
-        })
-        .catch((error) => {
-          throw new RpcException(error);
-        });
-      if (!deletedItems) {
-        throw new RpcException("The item wasn't deleted from carts.");
-      }
-    }
-
+  async deleteItem(id: string): Promise<DeleteItemDto | null> {
     const deletedItem = await this.prisma.item
       .delete({
         where: {
@@ -174,15 +130,12 @@ export class CartsService {
       });
 
     if (!deletedItem) {
-      throw new RpcException("The item wasn't deleted");
+      return null;
     }
     return { message: 'The items in all carts were deleted!' };
   }
 
-  async addItem(data: AddItemInCartDto): Promise<Cart> {
-    if (!data.itemId) {
-      throw new RpcException("The itemId wasn't provided.");
-    }
+  async addItem(data: AddItemInCartDto): Promise<string | null> {
     const item = await this.prisma.cart
       .upsert({
         where: {
@@ -220,12 +173,12 @@ export class CartsService {
         throw new RpcException(error);
       });
     if (!item) {
-      throw new RpcException("The item wasn't added.");
+      return null;
     }
-    return this.getCartByUserId(data.userId);
+    return data.userId;
   }
 
-  async updateItem(data: UpdateItemDto): Promise<ItemInCart> {
+  async updateItem(data: UpdateItemDto): Promise<ItemInCart | null> {
     const upsertedItem = await this.prisma.item
       .upsert({
         where: {
@@ -251,12 +204,12 @@ export class CartsService {
         throw new RpcException(error);
       });
     if (!upsertedItem) {
-      throw new RpcException("The item wasn't updated.");
+      return null;
     }
     return upsertedItem;
   }
 
-  async createItem(data: CreateItemDto): Promise<ItemInCart> {
+  async createItem(data: CreateItemDto): Promise<ItemInCart | null> {
     const createdItem = await this.prisma.item
       .create({
         data: data,
@@ -265,7 +218,7 @@ export class CartsService {
         throw new RpcException(error);
       });
     if (!createdItem) {
-      throw new RpcException("The item wasn't created.");
+      return null;
     }
     return createdItem;
   }

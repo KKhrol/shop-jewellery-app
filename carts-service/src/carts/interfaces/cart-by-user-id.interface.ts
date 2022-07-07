@@ -1,3 +1,3 @@
-export interface CartByUserId {
+export class CartByUserId {
   id: string;
 }

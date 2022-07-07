@@ -1,11 +1,11 @@
-export interface Cart {
+export class Cart {
   userId: string;
   itemInCart: ItemInCart[];
   varietyOfItems: number;
   totalPrice: number;
 }
 
-interface ItemInCart {
+export class ItemInCart {
   id: string;
   image: string;
   itemName: string;

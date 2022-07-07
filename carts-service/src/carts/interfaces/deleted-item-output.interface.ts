@@ -1,3 +1,3 @@
-export interface DeleteItemDto {
+export class DeleteItemDto {
   message: string;
 }

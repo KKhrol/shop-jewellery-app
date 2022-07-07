@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { CartsService } from './carts.service';
 import { CartById } from './interfaces/cart-by-id.interface';
 import { CartByItemId } from './interfaces/cart-by-item-id.interface';
@@ -18,19 +18,43 @@ export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
   @GrpcMethod('CartsController', 'FindCart')
   async findCart(data: CartByUserId): Promise<ResponseData<Cart>> {
+    const cart = await this.cartsService.getCartByUserId(data.id);
+
+    if (!cart) {
+      throw new RpcException('No carts were found!');
+    }
     return {
       status: 'success',
       message: 'The cart was found.',
-      data: await this.cartsService.getCartByUserId(data.id),
+      data: cart,
     };
   }
 
   @GrpcMethod('CartsController', 'UpdateCart')
   async updateCart(updateCartDto: UpdateCartDto): Promise<ResponseData<Cart>> {
+    if (updateCartDto.quantity === 0) {
+      throw new RpcException('Quantity of the item should be > 0');
+    }
+    if (!updateCartDto.itemId) {
+      throw new RpcException("The itemId wasn't provided.");
+    }
+
+    const userId = await this.cartsService.updateCart(updateCartDto);
+
+    if (!userId) {
+      throw new RpcException("The cart wasn't updated.");
+    }
+
+    const updatedCart = await this.cartsService.getCartByUserId(userId);
+
+    if (!updatedCart) {
+      throw new RpcException('No carts were found.');
+    }
+
     return {
       status: 'success',
       message: 'The cart was updated.',
-      data: await this.cartsService.updateCart(updateCartDto),
+      data: updatedCart,
     };
   }
 
@@ -38,37 +62,78 @@ export class CartsController {
   async deleteItemFromCart(
     cartByItemId: CartByItemId,
   ): Promise<ResponseData<Cart>> {
+    const deletedItem = await this.cartsService.removeItemFromCart(
+      cartByItemId,
+    );
+    if (!deletedItem) {
+      throw new RpcException("The item wasn't removed from cart.");
+    }
+
+    const updatedCart = await this.cartsService.getCartByUserId(deletedItem);
+
+    if (!updatedCart) {
+      throw new RpcException('No carts were found.');
+    }
+
     return {
       status: 'success',
       message: 'The item was deleted from cart.',
-      data: await this.cartsService.removeItemFromCart(cartByItemId),
+      data: updatedCart,
     };
   }
 
   @GrpcMethod('CartsController', 'ClearCart')
   async clearCart(data: CartByUserId): Promise<ResponseData<DeleteItemDto>> {
+    const deletedItems = await this.cartsService.clearCart(data.id);
+
+    if (!deletedItems) {
+      throw new RpcException("The cart wasn't cleared.");
+    }
+
     return {
       status: 'success',
       message: 'The cart was cleared.',
-      data: await this.cartsService.clearCart(data.id),
+      data: deletedItems,
     };
   }
 
   @GrpcMethod('CartsController', 'DeleteItem')
   async deleteItem(data: CartById): Promise<ResponseData<DeleteItemDto>> {
+    const deletedItem = await this.cartsService.deleteItem(data.id);
+
+    if (!deletedItem) {
+      throw new RpcException("The item wasn't deleted");
+    }
+
     return {
       status: 'success',
       message: 'The item was deleted.',
-      data: await this.cartsService.deleteItem(data.id),
+      data: deletedItem,
     };
   }
 
   @GrpcMethod('CartsController', 'AddItem')
   async addItem(addItemInCart: AddItemInCartDto): Promise<ResponseData<Cart>> {
+    if (!addItemInCart.itemId) {
+      throw new RpcException("The itemId wasn't provided.");
+    }
+
+    const userId = await this.cartsService.addItem(addItemInCart);
+
+    if (!userId) {
+      throw new RpcException("The item wasn't added.");
+    }
+
+    const updatedCart = await this.cartsService.getCartByUserId(userId);
+
+    if (!updatedCart) {
+      throw new RpcException('No carts were found.');
+    }
+
     return {
       status: 'success',
       message: 'The item was added to cart.',
-      data: await this.cartsService.addItem(addItemInCart),
+      data: updatedCart,
     };
   }
 
@@ -76,10 +141,16 @@ export class CartsController {
   async updateItem(
     updateItemDto: UpdateItemDto,
   ): Promise<ResponseData<ItemInCart>> {
+    const updatedItem = await this.cartsService.updateItem(updateItemDto);
+
+    if (!updatedItem) {
+      throw new RpcException("The item wasn't updated.");
+    }
+
     return {
       status: 'success',
       message: 'The ites was updated.',
-      data: await this.cartsService.updateItem(updateItemDto),
+      data: updatedItem,
     };
   }
 
@@ -87,10 +158,15 @@ export class CartsController {
   async createItem(
     createItemDto: CreateItemDto,
   ): Promise<ResponseData<ItemInCart>> {
+    const createdItem = await this.cartsService.createItem(createItemDto);
+
+    if (!createdItem) {
+      throw new RpcException("The item wasn't created.");
+    }
     return {
       status: 'success',
       message: 'The item was created.',
-      data: await this.cartsService.createItem(createItemDto),
+      data: createdItem,
     };
   }
 }
