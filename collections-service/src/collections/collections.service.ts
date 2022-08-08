@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Collection } from '@prisma/client';
-import { CreateCollectionDto } from './interfaces/create-collection.interface';
-import { UpdateCollectionDto } from './interfaces/update-collection.interface';
-import { DeleteCollectionDto } from './interfaces/delete-collection.interface';
+
 import { RpcException } from '@nestjs/microservices';
-import { CollectionFullInfo } from './interfaces/collection-full-info.interface';
+import { CollectionFullInfo } from './dto/collection-full-info.dto';
+import { CreateCollectionDto } from './dto/create-collection.dto';
+import { DeleteCollectionDto } from './dto/delete-collection.dto';
+import { UpdateCollectionDto } from './dto/update-collection.dto';
 
 @Injectable()
 export class CollectionsService {

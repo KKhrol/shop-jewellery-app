@@ -1,14 +1,14 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { CollectionsService } from './collections.service';
-import { CollectionById } from './interfaces/collection-by-id.interface';
-import { CollectionFullInfo } from './interfaces/collection-full-info.interface';
-import { Collection } from './interfaces/collection.interface';
-import { CollectionsOnPage } from './interfaces/collections-page.interface';
-import { CreateCollectionDto } from './interfaces/create-collection.interface';
-import { DeleteCollectionDto } from './interfaces/delete-collection.interface';
-import { ResponseData } from './interfaces/response-data.interface';
-import { UpdateCollectionDto } from './interfaces/update-collection.interface';
+import { CollectionById } from './dto/collection-by-id.dto';
+import { CollectionFullInfo } from './dto/collection-full-info.dto';
+import { Collection } from './dto/collection.dto';
+import { CollectionsOnPage } from './dto/collections-page.dto';
+import { CreateCollectionDto } from './dto/create-collection.dto';
+import { DeleteCollectionDto } from './dto/delete-collection.dto';
+import { ResponseData } from './dto/response-data.dto';
+import { UpdateCollectionDto } from './dto/update-collection.dto';
 
 @Controller('collections')
 export class CollectionsController {

@@ -7,17 +7,17 @@ import { ValidationViaClassPipe } from './pipes/validation-via-class.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationViaClassPipe());
-  app.use(
+  //app.useGlobalPipes(new ValidationViaClassPipe());
+  /*app.use(
     session({
       secret: 'my-secret',
       resave: false,
       saveUninitialized: false,
     }),
-  );
-  app.use(passport.initialize());
-  app.use(passport.session());
-  await app.listen(3001);
+  );*/
+  //app.use(passport.initialize());
+  //app.use(passport.session());
+  await app.listen(8001);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

@@ -32,8 +32,8 @@ import { CollectionFullInfo } from './interfaces/collection-full-info.interface'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { HttpExceptionFilter } from '../filters/exception.filter';
 
-@UseFilters(new HttpExceptionFilter())
-@UseGuards(JwtAuthGuard)
+//@UseFilters(new HttpExceptionFilter())
+//@UseGuards(JwtAuthGuard)
 @Controller('collections')
 export class CollectionsController implements OnModuleInit {
   constructor(
@@ -79,7 +79,7 @@ export class CollectionsController implements OnModuleInit {
   getCollections(
     @Query('page') numberOfPage: number,
   ): Observable<ResponseData<Collection[]> | ResponseError> {
-    const itemsPerPage = 20;
+    const itemsPerPage = 5;
     const page = Number(numberOfPage);
 
     const collections = this.collectionsService.findMany({
